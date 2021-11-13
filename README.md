@@ -31,6 +31,13 @@
 
 # ScreenShot
 
+## Ubuntu 20.04 运行效果
+
+|   启动页面   |   翻译效果   |
+| ---- | ---- |
+|  ![windows](./res-static/screenshot/linux.png)    |   ![windows-2](./res-static/screenshot/linux2.png)   |
+
+
 ## Windows 运行效果
 
 |   启动页面   |   翻译效果   |
