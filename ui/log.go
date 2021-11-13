@@ -7,6 +7,10 @@ import (
 	"github.com/Ericwyn/EzeTranslate/log"
 )
 
+var logWindow fyne.Window
+var logEntryBox *widget.Entry
+var logWindowsOpening = false
+
 func showLogUi() {
 
 	if logWindowsOpening {

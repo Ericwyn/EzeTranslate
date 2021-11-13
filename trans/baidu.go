@@ -47,10 +47,8 @@ var baiduAppId string
 var baiduAppSecret string
 
 func translate(word string) []byte { //调用api进行翻译
-	if baiduAppId == "" || baiduAppSecret == "" {
-		baiduAppId = viper.GetString(conf.ConfigKeyBaiduTransAppId)
-		baiduAppSecret = viper.GetString(conf.ConfigKeyBaiduTransAppSecret)
-	}
+	baiduAppId = viper.GetString(conf.ConfigKeyBaiduTransAppId)
+	baiduAppSecret = viper.GetString(conf.ConfigKeyBaiduTransAppSecret)
 
 	data := make(url.Values)
 	data["q"] = []string{word}

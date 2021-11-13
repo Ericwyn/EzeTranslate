@@ -2,13 +2,8 @@ package ui
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
 	"net/url"
 )
-
-var logWindow fyne.Window
-var logEntryBox *widget.Entry
-var logWindowsOpening = false
 
 /*
 菜单结构是这样的
@@ -26,12 +21,16 @@ var logWindowsOpening = false
 */
 func createAppMenu() *fyne.MainMenu {
 
-	openLogMenuItem := fyne.NewMenuItem("运行日志", func() {
+	configSetMenuItem := fyne.NewMenuItem("参数设置", func() {
+		showSetUi()
+	})
+
+	openLogMenuItem := fyne.NewMenuItem("日志查看", func() {
 		showLogUi()
 	})
 	openLogMenuItem.IsQuit = true
 
-	logMenu := fyne.NewMenu("日志", openLogMenuItem)
+	logMenu := fyne.NewMenu("设置", configSetMenuItem, openLogMenuItem)
 
 	mainMenu := fyne.NewMainMenu(
 		logMenu,
