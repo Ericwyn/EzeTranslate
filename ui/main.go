@@ -10,6 +10,8 @@ import (
 	"github.com/Ericwyn/EzeTranslate/strutils"
 	"github.com/spf13/viper"
 	"os"
+	"strings"
+
 	//"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	//"github.com/Ericwyn/GoTools/file"
@@ -110,7 +112,6 @@ func showMainUi() {
 	bottomPanel := container.NewHBox(
 		container.NewHBox(
 			widget.NewButton("翻译当前文字", func() {
-				transResBox.SetPlaceHolder("正在翻译..........")
 				startTrans()
 			}),
 		),
@@ -140,6 +141,13 @@ func showMainUi() {
 
 func startTrans() {
 	formatText := strutils.FormatInputBoxText(inputBox.Text)
+
+	if strings.Trim(formatText, " ") == "" {
+		transResBox.SetPlaceHolder("请输入需要翻译的内容")
+		return
+	}
+
+	transResBox.SetPlaceHolder("正在翻译..........")
 	//inputBox.SetText(formatText)
 	go trans.BaiduTrans(formatText, func(result string, note string) {
 		fmt.Println("翻译结果:", result)
@@ -179,7 +187,6 @@ func startUnixSocketServer() {
 			fmt.Println("获取的划词:", selectText)
 			// 刷新当前数据
 			inputBox.SetText(selectText)
-			transResBox.SetPlaceHolder("正在翻译..........")
 
 			startTrans()
 
