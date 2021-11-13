@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"strings"
+	"time"
 
 	//"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -24,7 +25,7 @@ import (
 	"runtime"
 )
 
-func StartApp() {
+func StartApp(xclip bool) {
 
 	shell.Debug(true)
 
@@ -37,6 +38,14 @@ func StartApp() {
 
 	// 开启 server 监听来自其他进程的翻译请求
 	startUnixSocketServer()
+
+	// 如果启动时候带有参数的话，那么就应该直接获取一遍选中的文字并进行翻译
+	if xclip {
+		go func() {
+			time.Sleep(time.Millisecond * 500)
+			trySendMessage()
+		}()
+	}
 
 	showMainUi()
 }

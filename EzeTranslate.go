@@ -1,7 +1,13 @@
 package main
 
-import "github.com/Ericwyn/EzeTranslate/ui"
+import (
+	"flag"
+	"github.com/Ericwyn/EzeTranslate/ui"
+)
+
+var xClipFlag = flag.Bool("x", false, "use xclip to get selected text after boot")
 
 func main() {
-	ui.StartApp()
+	flag.Parse()
+	ui.StartApp(*xClipFlag)
 }
