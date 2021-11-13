@@ -25,7 +25,9 @@
 
 # ScreenShot
 
-|   Windows   |   Ubuntu   |
+## Windows 运行效果
+
+|   启动页面   |   翻译效果   |
 | ---- | ---- |
-|  ![linux](./res-static/screenshot/windows.png)    |   待补充   |
+|  ![linux](./res-static/screenshot/windows.png)    |   ![windows-2](./res-static/screenshot/windows-2.png)   |
 
