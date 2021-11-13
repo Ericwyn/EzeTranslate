@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"github.com/spf13/viper"
 )
 

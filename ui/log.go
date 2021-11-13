@@ -4,7 +4,7 @@ import (
 	fyne "fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 )
 
 func showLogUi() {

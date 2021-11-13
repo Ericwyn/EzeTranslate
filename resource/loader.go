@@ -3,7 +3,7 @@ package resource
 import (
 	"bufio"
 	"fyne.io/fyne/v2"
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"io"
 	"os"
 )

@@ -1,6 +1,6 @@
 package ipc
 
-import "github.com/Ericwyn/TransUtils/log"
+import "github.com/Ericwyn/EzeTranslate/log"
 
 const MessageNewSelection string = "NEW_SELECTION\n"
 

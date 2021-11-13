@@ -1,7 +1,7 @@
 package ipc
 
 import (
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 )
 
 func SendMessage(message string) error {

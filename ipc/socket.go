@@ -2,7 +2,7 @@ package ipc
 
 import (
 	"fmt"
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"net"
 	"os"
 	"time"

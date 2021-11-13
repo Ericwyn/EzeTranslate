@@ -3,7 +3,7 @@ package ajax
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/Ericwyn/TransUtils/log"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"io"
 	"io/ioutil"
 	"mime/multipart"

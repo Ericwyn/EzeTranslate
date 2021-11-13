@@ -1,8 +1,8 @@
 package trans
 
 import (
+	"github.com/Ericwyn/EzeTranslate/log"
 	"github.com/Ericwyn/GoTools/shell"
-	"github.com/Ericwyn/TransUtils/log"
 	"strings"
 	"unicode"
 )

@@ -1,7 +1,7 @@
 package strutils
 
 import (
-	"github.com/Ericwyn/TransUtils/conf"
+	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/spf13/viper"
 	"strings"
 )
