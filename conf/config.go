@@ -8,9 +8,17 @@ import (
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
 const ConfigKeyBaiduTransAppSecret = "baiduTransAppSecret"
 
+const ConfigKeyFormatSpace = "formatSpace"
+const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
+const ConfigKeyFormatAnnotation = "formatAnnotation"
+
 func InitConfig() {
 	viper.SetDefault(ConfigKeyBaiduTransAppId, "baiduTransAppId-xxxxxxxxxxxxxxx")
 	viper.SetDefault(ConfigKeyBaiduTransAppSecret, "baiduTransAppSecret-xxxxxxxxxxxxxxx")
+
+	viper.SetDefault(ConfigKeyFormatSpace, false)
+	viper.SetDefault(ConfigKeyFormatCarriageReturn, false)
+	viper.SetDefault(ConfigKeyFormatAnnotation, false)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")

@@ -5,3 +5,8 @@ baiduTransAppSecret: baiduTransAppSecret-xxxxxxxxxxxxxxx
 # 有道翻译 API 信息, 该配置未启用
 youdaoTransAppId: youdaoTransAppId-xxxxxxxxxxxxxxx
 youdaoTransSecret: youdaoTransAppSecret-xxxxxxxxxxxxxxx
+
+# 格式化配置
+formatannotation: false
+formatcarriagereturn: false
+formatspace: false
