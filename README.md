@@ -13,9 +13,12 @@
 另外针对代码注释的翻译做特殊格式化
 
 ## Feature
-- 基于 Baidu 翻译 API 接口的单词, 语句翻译
-  - 需要在 config.yaml 当中配置 API 参数
-  
+- 翻译 API 接口的单词, 语句翻译
+  - 支持 Baidu 翻译 API
+    - 需要在 config.yaml 当中配置 Baidu API 参数
+  - 支持 Google 翻译 API
+    - 国内的话, 需要在 config.yaml 当中配置 translate.google.com 的代理
+    - 可以使用 cloudflare worker 做 js proxy 
 - 针对代码注释进行格式化
   - 去除 `//` `/*` `#` 之类的符号
   - 去除回车, 多余空格等
@@ -29,5 +32,5 @@
 
 |   启动页面   |   翻译效果   |
 | ---- | ---- |
-|  ![linux](./res-static/screenshot/windows.png)    |   ![windows-2](./res-static/screenshot/windows-2.png)   |
+|  ![windows](./res-static/screenshot/windows.png)    |   ![windows-2](./res-static/screenshot/windows-2.png)   |
 

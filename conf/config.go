@@ -12,9 +12,16 @@ const ConfigKeyFormatSpace = "formatSpace"
 const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
 const ConfigKeyFormatAnnotation = "formatAnnotation"
 
+// google, baidu,
+const ConfigKeyTranslateSelect = "translateSelect"
+const ConfigKeyGoogleTranslateProxy = "googleTranslateProxy"
+
 func InitConfig() {
 	viper.SetDefault(ConfigKeyBaiduTransAppId, "baiduTransAppId-xxxxxxxxxxxxxxx")
 	viper.SetDefault(ConfigKeyBaiduTransAppSecret, "baiduTransAppSecret-xxxxxxxxxxxxxxx")
+
+	viper.SetDefault(ConfigKeyGoogleTranslateProxy, "google.com")
+	viper.SetDefault(ConfigKeyTranslateSelect, "google")
 
 	viper.SetDefault(ConfigKeyFormatSpace, false)
 	viper.SetDefault(ConfigKeyFormatCarriageReturn, false)

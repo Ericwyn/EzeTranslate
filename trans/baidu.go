@@ -28,7 +28,7 @@ func u2s(form string) (to string, err error) { //unicode转字符串
 	}
 	for i, bl, br, r := 0, len(bs), bytes.NewReader(bs), uint16(0); i < bl; i += 2 {
 		binary.Read(br, binary.BigEndian, &r)
-		to += string(r)
+		to += fmt.Sprint(r)
 	}
 	return
 }
@@ -75,6 +75,9 @@ func translate(word string) []byte { //调用api进行翻译
 type TransResCallback func(result string, note string)
 
 func BaiduTrans(words string, callback TransResCallback) { //翻译函数
+
+	log.D("Baidu 翻译文字:", words)
+
 	body := translate(words)
 
 	log.D("翻译结果", string(body))

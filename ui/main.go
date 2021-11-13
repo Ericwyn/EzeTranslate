@@ -99,12 +99,36 @@ func showMainUi() {
 	inputBoxPanel = container.NewBorder(inputBoxPanelTitle, nil, nil, nil,
 		container.NewGridWithColumns(1, inputBox))
 
+	transResBoxPanelTitle := container.NewHBox(
+		widget.NewLabel("翻译结果        "),
+		cusWeight.CreateCheckGroup(
+			[]cusWeight.LabelAndInit{
+				{"Google接口", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
+				{"Baidu接口", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
+			},
+			true, // 横向
+			true, // 单选
+			func(label string, checked bool) {
+				if label == "Google接口" {
+					viper.Set(conf.ConfigKeyTranslateSelect, "google")
+				} else if label == "Baidu接口" {
+					viper.Set(conf.ConfigKeyTranslateSelect, "baidu")
+				}
+				e := viper.WriteConfig()
+				if e != nil {
+					log.E("配置文件保存失败")
+					log.E(e)
+				}
+			},
+		),
+	)
+
 	transResBox = widget.NewMultiLineEntry()
 	transResBox.SetPlaceHolder(`等待翻译中...`)
 	//transResBox.Enable()
 	transResBox.Wrapping = fyne.TextWrapBreak
 
-	transResBoxPanel = container.NewBorder(widget.NewLabel("翻译结果"), nil, nil, nil,
+	transResBoxPanel = container.NewBorder(transResBoxPanelTitle, nil, nil, nil,
 		container.NewGridWithColumns(1, transResBox))
 
 	noteLabel = widget.NewLabel("")
@@ -148,12 +172,19 @@ func startTrans() {
 	}
 
 	transResBox.SetPlaceHolder("正在翻译..........")
-	//inputBox.SetText(formatText)
-	go trans.BaiduTrans(formatText, func(result string, note string) {
+
+	handleTransResult := func(result string, note string) {
 		fmt.Println("翻译结果:", result)
 		transResBox.SetText(result)
 		noteLabel.SetText(note)
-	})
+	}
+
+	if viper.GetString(conf.ConfigKeyTranslateSelect) == "google" {
+		go trans.GoogleTrans(formatText, handleTransResult)
+	} else if viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu" {
+		go trans.BaiduTrans(formatText, handleTransResult)
+	}
+
 }
 
 func trySendMessage() bool {
