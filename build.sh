@@ -1,0 +1,1 @@
+fyne package -icon ./res-static/icon/icon.png
