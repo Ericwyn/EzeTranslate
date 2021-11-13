@@ -23,8 +23,11 @@
   - 去除 `//` `/*` `#` 之类的符号
   - 去除回车, 多余空格等
 - 划词翻译 (仅支持 Linux, 需要 xclip )
-- xxxxxxxxx TODO
 
+## Todo
+- 驼峰命名的变量和函数名编译
+- windows 监听剪贴板, 快速编译
+- windows IPC 支持
 
 # ScreenShot
 
