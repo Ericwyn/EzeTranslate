@@ -9,6 +9,9 @@ import (
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
 const ConfigKeyBaiduTransAppSecret = "baiduTransAppSecret"
 
+const ConfigKeyYouDaoTransAppId = "youdaoTransAppId"
+const ConfigKeyYouDaoTransAppSecret = "youdaoTransAppSecret"
+
 const ConfigKeyFormatSpace = "formatSpace"
 const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
 const ConfigKeyFormatAnnotation = "formatAnnotation"
@@ -20,6 +23,9 @@ const ConfigKeyGoogleTranslateProxy = "googleTranslateProxy"
 func InitConfig() {
 	viper.SetDefault(ConfigKeyBaiduTransAppId, "baiduTransAppId-xxxxxxxxxxxxxxx")
 	viper.SetDefault(ConfigKeyBaiduTransAppSecret, "baiduTransAppSecret-xxxxxxxxxxxxxxx")
+
+	viper.SetDefault(ConfigKeyYouDaoTransAppId, "youdaoTransAppId-xxxxxxxxxxxxxxx")
+	viper.SetDefault(ConfigKeyYouDaoTransAppSecret, "youdaoTransAppSecret-xxxxxxxxxxxxxxx")
 
 	viper.SetDefault(ConfigKeyGoogleTranslateProxy, "google.com")
 	viper.SetDefault(ConfigKeyTranslateSelect, "google")

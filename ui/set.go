@@ -31,6 +31,14 @@ func showSetUi() {
 	baiduAppSecretEntry.SetPlaceHolder("百度翻译 AppSecret")
 	baiduAppSecretEntry.SetText(viper.GetString(conf.ConfigKeyBaiduTransAppSecret))
 
+	youdaoAppIdEntry := widget.NewEntry()
+	youdaoAppIdEntry.SetPlaceHolder("有道翻译 AppId")
+	youdaoAppIdEntry.SetText(viper.GetString(conf.ConfigKeyYouDaoTransAppId))
+
+	youdaoAppSecretEntry := widget.NewEntry()
+	youdaoAppSecretEntry.SetPlaceHolder("有道翻译 AppSecret")
+	youdaoAppSecretEntry.SetText(viper.GetString(conf.ConfigKeyYouDaoTransAppSecret))
+
 	googleTranslateProxyEntry := widget.NewEntry()
 	googleTranslateProxyEntry.SetPlaceHolder("Google 翻译代理地址")
 	googleTranslateProxyEntry.SetText(viper.GetString(conf.ConfigKeyGoogleTranslateProxy))
@@ -39,6 +47,9 @@ func showSetUi() {
 		Items: []*widget.FormItem{
 			{Text: "百度 AppId    ", Widget: baiduAppIdEntry, HintText: "请填写从百度处申请到的 AppId"},
 			{Text: "百度 AppSecret", Widget: baiduAppSecretEntry, HintText: "请填写从百度处申请到的 AppSecret"},
+			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
+			{Text: "有道 AppId    ", Widget: youdaoAppIdEntry, HintText: "请填写从有道处申请到的 AppId"},
+			{Text: "有道 AppSecret", Widget: youdaoAppSecretEntry, HintText: "请填写从有道处申请到的 AppSecret"},
 			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
 			{Text: "Google Host", Widget: googleTranslateProxyEntry, HintText: "google 翻译的代理地址, 填写 translate.xxxxx.xxx 后面部分"},
 			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
@@ -49,7 +60,12 @@ func showSetUi() {
 			log.D("保存设置")
 			viper.Set(conf.ConfigKeyBaiduTransAppId, baiduAppIdEntry.Text)
 			viper.Set(conf.ConfigKeyBaiduTransAppSecret, baiduAppSecretEntry.Text)
+
+			viper.Set(conf.ConfigKeyYouDaoTransAppId, youdaoAppIdEntry.Text)
+			viper.Set(conf.ConfigKeyYouDaoTransAppSecret, youdaoAppSecretEntry.Text)
+
 			viper.Set(conf.ConfigKeyGoogleTranslateProxy, googleTranslateProxyEntry.Text)
+
 			err := viper.WriteConfig()
 			if err != nil {
 				log.E("保存设置时候发生错误")
