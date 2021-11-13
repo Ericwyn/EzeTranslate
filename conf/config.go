@@ -2,6 +2,7 @@ package conf
 
 import (
 	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/Ericwyn/EzeTranslate/resource"
 	"github.com/spf13/viper"
 )
 
@@ -29,8 +30,8 @@ func InitConfig() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".conf")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath(resource.GetRunnerPath() + "/.conf")
+	viper.AddConfigPath(resource.GetRunnerPath())
 	err := viper.ReadInConfig()
 
 	if err != nil {

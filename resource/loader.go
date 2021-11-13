@@ -6,9 +6,28 @@ import (
 	"github.com/Ericwyn/EzeTranslate/log"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 var resourceBuf = make(map[string]*fyne.StaticResource)
+var runnerPath = ""
+
+func GetRunnerPath() string {
+	if runnerPath == "" {
+		//返回绝对路径  filepath.Dir(os.Args[0])去除最后一个元素的路径
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			log.E("无法获取程序运行目录")
+			log.E(err)
+		}
+
+		//将\替换成/
+		runnerPath = strings.Replace(dir, "\\", "/", -1)
+	}
+
+	return runnerPath
+}
 
 func GetResource(resourcePath string) *fyne.StaticResource {
 
