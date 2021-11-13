@@ -10,7 +10,6 @@ import (
 	"github.com/Ericwyn/TransUtils/strutils"
 	"github.com/spf13/viper"
 	"os"
-
 	//"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	//"github.com/Ericwyn/GoTools/file"
@@ -38,8 +37,6 @@ func StartApp() {
 	startUnixSocketServer()
 
 	showMainUi()
-
-	showLogUi()
 }
 
 var mainApp fyne.App
@@ -174,6 +171,10 @@ func startUnixSocketServer() {
 		log.D("接收到 IPC 消息")
 		switch message {
 		case ipc.MessageNewSelection:
+
+			// 请求焦点
+			mainWindow.RequestFocus()
+
 			selectText := trans.GetSelection()
 			fmt.Println("获取的划词:", selectText)
 			// 刷新当前数据
