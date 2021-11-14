@@ -69,7 +69,7 @@ func showMainUi() {
 	mainApp.SetIcon(resource.ResourceIcon)
 	mainApp.Settings().SetTheme(&resource.CustomerTheme{})
 
-	mainWindow = mainApp.NewWindow("划词翻译")
+	mainWindow = mainApp.NewWindow("EzeTranslate")
 
 	mainWindow.SetMainMenu(createAppMenu())
 
@@ -77,6 +77,7 @@ func showMainUi() {
 		Width:  400,
 		Height: 600,
 	})
+	mainWindow.CenterOnScreen()
 
 	inputBoxPanelTitle := container.NewHBox(
 		widget.NewLabel("翻译设置        "),

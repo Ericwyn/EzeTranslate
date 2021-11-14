@@ -19,10 +19,12 @@ func showLogUi() {
 	}
 
 	logWindow = mainApp.NewWindow("运行日志")
+
 	logWindow.Resize(fyne.Size{
 		Width:  600,
 		Height: 600,
 	})
+	logWindow.CenterOnScreen()
 
 	logEntryBox = widget.NewMultiLineEntry()
 

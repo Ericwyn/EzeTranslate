@@ -22,6 +22,7 @@ func showSetUi() {
 		Width: 500,
 		//Height: 600,
 	})
+	setWindow.CenterOnScreen()
 
 	baiduAppIdEntry := widget.NewEntry()
 	baiduAppIdEntry.SetPlaceHolder("百度翻译 AppId")

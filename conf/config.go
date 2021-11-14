@@ -6,6 +6,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+const Version = "V1.0"
+const ReleaseDate = "2021.11.14"
+
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
 const ConfigKeyBaiduTransAppSecret = "baiduTransAppSecret"
 

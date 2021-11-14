@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fyne.io/fyne/v2"
-	"net/url"
 )
 
 /*
@@ -34,10 +33,11 @@ func createAppMenu() *fyne.MainMenu {
 
 	mainMenu := fyne.NewMainMenu(
 		logMenu,
-		fyne.NewMenu("关于", fyne.NewMenuItem("Github ", func() {
-			u, _ := url.Parse("https://github.com/Ericwyn/EzeTranslate")
-			_ = mainApp.OpenURL(u)
-		})),
+		fyne.NewMenu("关于",
+			fyne.NewMenuItem("版本信息 ", func() {
+				showAboutUi()
+			}),
+		),
 	)
 
 	return mainMenu
