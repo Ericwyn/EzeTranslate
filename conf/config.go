@@ -44,6 +44,24 @@ func InitConfig() {
 		log.E("载入配置时候出错")
 		panic(err)
 	}
+	printConfigs()
+}
+
+func printConfigs() {
+	configList := []string{
+		ConfigKeyBaiduTransAppId,
+		ConfigKeyBaiduTransAppSecret,
+		ConfigKeyYouDaoTransAppId,
+		ConfigKeyYouDaoTransAppSecret,
+		ConfigKeyFormatSpace,
+		ConfigKeyFormatCarriageReturn,
+		ConfigKeyFormatAnnotation,
+		ConfigKeyTranslateSelect,
+		ConfigKeyGoogleTranslateProxy,
+	}
+	for _, key := range configList {
+		log.D("config " + key + "  :  " + viper.GetString(key))
+	}
 }
 
 // 返回百度翻译 api 的 appId 和 appSecret

@@ -8,6 +8,9 @@ import (
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/resource/cusWeight"
 	"github.com/Ericwyn/EzeTranslate/strutils"
+	"github.com/Ericwyn/EzeTranslate/trans/baidu"
+	"github.com/Ericwyn/EzeTranslate/trans/google"
+	"github.com/Ericwyn/EzeTranslate/trans/youdao"
 	"github.com/spf13/viper"
 	"os"
 	"strings"
@@ -112,16 +115,19 @@ func showMainUi() {
 		widget.NewLabel("翻译结果        "),
 		cusWeight.CreateCheckGroup(
 			[]cusWeight.LabelAndInit{
-				{"Google接口", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
-				{"Baidu接口", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
+				{"Google", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
+				{"Baidu", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
+				{"Youdao", viper.GetString(conf.ConfigKeyTranslateSelect) == "youdao"},
 			},
 			true, // 横向
 			true, // 单选
 			func(label string, checked bool) {
-				if label == "Google接口" {
+				if label == "Google" {
 					viper.Set(conf.ConfigKeyTranslateSelect, "google")
-				} else if label == "Baidu接口" {
+				} else if label == "Baidu" {
 					viper.Set(conf.ConfigKeyTranslateSelect, "baidu")
+				} else if label == "Youdao" {
+					viper.Set(conf.ConfigKeyTranslateSelect, "youdao")
 				}
 				e := viper.WriteConfig()
 				if e != nil {
@@ -189,9 +195,11 @@ func startTrans() {
 	}
 
 	if viper.GetString(conf.ConfigKeyTranslateSelect) == "google" {
-		go trans.GoogleTrans(formatText, handleTransResult)
+		go google.Translate(formatText, handleTransResult)
 	} else if viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu" {
-		go trans.BaiduTrans(formatText, handleTransResult)
+		go baidu.Translate(formatText, handleTransResult)
+	} else if viper.GetString(conf.ConfigKeyTranslateSelect) == "youdao" {
+		go youdao.Translate(formatText, handleTransResult)
 	}
 
 }

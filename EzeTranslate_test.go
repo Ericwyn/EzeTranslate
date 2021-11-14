@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/strutils"
-	"github.com/Ericwyn/EzeTranslate/trans"
+	"github.com/Ericwyn/EzeTranslate/trans/google"
+	"github.com/Ericwyn/EzeTranslate/trans/youdao"
 	"testing"
 )
 
@@ -21,11 +22,23 @@ func TestFormatAnnotation(t *testing.T) {
 func TestGoogleTrans(t *testing.T) {
 	conf.InitConfig()
 
-	trans.GoogleTrans("你好啊", func(result string, note string) {
+	google.Translate("你好啊", func(result string, note string) {
 		fmt.Println("你好啊 -> " + result)
 	})
 
-	trans.GoogleTrans("hello", func(result string, note string) {
+	google.Translate("hello", func(result string, note string) {
+		fmt.Println("hello -> " + result)
+	})
+}
+
+func TestYoudaoTrans(t *testing.T) {
+	conf.InitConfig()
+
+	youdao.Translate("你好啊", func(result string, note string) {
+		fmt.Println("你好啊 -> " + result)
+	})
+
+	youdao.Translate("hello", func(result string, note string) {
 		fmt.Println("hello -> " + result)
 	})
 }

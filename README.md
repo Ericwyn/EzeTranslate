@@ -15,10 +15,12 @@
 ## Feature
 - 翻译 API 接口的单词, 语句翻译
   - 支持 Baidu 翻译 API
-    - 需要在 config.yaml 当中配置 Baidu API 参数
+    - 需要在参数设置当中配置 Baidu API 参数
   - 支持 Google 翻译 API
-    - 国内的话, 需要在 config.yaml 当中配置 translate.google.com 的代理
-    - 可以使用 cloudflare worker 做 js proxy 
+    - 国内的话, 需要在参数设置当中配置 translate.google.com 的代理
+    - 可以使用 cloudflare worker 做 js proxy
+  - 支持 Youdao 翻译 API
+    - 需要在参数设置当中配置 Youdao API 参数
 - 针对代码注释进行格式化
   - 去除 `//` `/*` `#` 之类的符号
   - 去除回车, 多余空格等
@@ -26,6 +28,7 @@
 
 ## Todo
 - 驼峰命名的变量和函数名编译
+- 多个翻译任务的时候, 停止之前的任务
 - windows 监听剪贴板, 快速编译
 - windows IPC 支持
 

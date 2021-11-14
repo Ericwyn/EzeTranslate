@@ -7,14 +7,16 @@ import (
 	"unicode"
 )
 
+type TransResCallback func(result string, note string)
+
 // 获取选择的文字
 func GetSelection() string {
 	return shell.RunShellRes("xclip", "-out")
 }
 
 // 翻译文字
-func TranslateStr(str string) string {
-
+// 使用 translate-shell 进行翻译
+func ShellTranslateStr(str string) string {
 	log.D("翻译文字:", str)
 
 	// 判断 str 是否包含中文

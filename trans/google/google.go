@@ -1,15 +1,16 @@
-package trans
+package google
 
 import (
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/Ericwyn/EzeTranslate/trans"
 	"github.com/bregydoc/gtranslate"
 	"github.com/spf13/viper"
 	"golang.org/x/text/language"
 	"unicode"
 )
 
-func GoogleTrans(str string, transCallback TransResCallback) {
+func Translate(str string, transCallback trans.TransResCallback) {
 
 	log.D("Google 翻译文字:", str)
 

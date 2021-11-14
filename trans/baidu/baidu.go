@@ -1,4 +1,4 @@
-package trans
+package baidu
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/Ericwyn/EzeTranslate/trans"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"net/http"
@@ -70,9 +71,7 @@ func translate(word string) []byte { //调用api进行翻译
 	return body
 }
 
-type TransResCallback func(result string, note string)
-
-func BaiduTrans(words string, callback TransResCallback) { //翻译函数
+func Translate(words string, callback trans.TransResCallback) { //翻译函数
 
 	log.D("Baidu 翻译文字:", words)
 
