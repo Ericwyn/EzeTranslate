@@ -12,12 +12,15 @@ import (
 	"github.com/Ericwyn/EzeTranslate/log"
 )
 
-// 翻译入口页面
+// 迷你翻译页面
+// 对比起 home ui, 去除了输入窗口
 
 var miniWindow fyne.Window
 var miniTransResBoxPanel *fyne.Container
 var miniTransResBox *widget.Entry
 var miniNoteLabel *widget.Label
+
+var miniSelectTextNow = ""
 
 func showMiniUi(showAndRun bool) {
 
@@ -95,11 +98,9 @@ func showMiniUi(showAndRun bool) {
 	miniNoteLabel = widget.NewLabel("")
 
 	miniBottomPanel := container.NewHBox(
-		container.NewHBox(
-			widget.NewButton("翻译选中文字", func() {
-				startTrans()
-			}),
-		),
+		widget.NewButton("翻译选中文字", func() {
+			startTrans()
+		}),
 		widget.NewButton("完整模式", func() {
 			// 断开 homeUi 的 Closed 回调, 不关闭 app
 			miniWindow.SetOnClosed(func() {})
@@ -110,9 +111,10 @@ func showMiniUi(showAndRun bool) {
 			closeMiniUi()
 			homeTransResBox.SetText(resBoxText)
 			homeNoteLabel.SetText(noteText)
-
+			homeInputBox.SetText(miniSelectTextNow)
+			conf.SaveConfig()
 		}),
-		homeNoteLabel,
+		miniNoteLabel,
 	)
 
 	miniPanel := container.NewBorder(nil, miniBottomPanel, nil, nil,

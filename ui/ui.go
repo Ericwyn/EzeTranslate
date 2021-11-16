@@ -51,7 +51,11 @@ func StartApp(xclip bool) {
 	mainApp.Settings().SetTheme(&resource.CustomerTheme{})
 
 	// 启动主页面
-	showHomeUi(true)
+	if viper.GetBool(conf.ConfigKeyMiniMode) {
+		showMiniUi(true)
+	} else {
+		showHomeUi(true)
+	}
 }
 
 func startTrans() {
@@ -141,6 +145,8 @@ func startUnixSocketServer() {
 
 			selectText := trans.GetSelection()
 			fmt.Println("获取的划词:", selectText)
+
+			miniSelectTextNow = selectText
 
 			if inputBox != nil && strings.Trim(inputBox.Text, " ") ==
 				strings.Trim(selectText, " ") {

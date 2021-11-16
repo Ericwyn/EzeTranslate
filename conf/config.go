@@ -9,6 +9,7 @@ import (
 const Version = "V1.0"
 const ReleaseDate = "2021.11.14"
 
+const ConfigKeyMiniMode = "miniMode"
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
 const ConfigKeyBaiduTransAppSecret = "baiduTransAppSecret"
 
@@ -24,6 +25,8 @@ const ConfigKeyTranslateSelect = "translateSelect"
 const ConfigKeyGoogleTranslateProxy = "googleTranslateProxy"
 
 func InitConfig() {
+	viper.SetDefault(ConfigKeyMiniMode, false)
+
 	viper.SetDefault(ConfigKeyBaiduTransAppId, "baiduTransAppId-xxxxxxxxxxxxxxx")
 	viper.SetDefault(ConfigKeyBaiduTransAppSecret, "baiduTransAppSecret-xxxxxxxxxxxxxxx")
 
@@ -70,4 +73,12 @@ func printConfigs() {
 // 返回百度翻译 api 的 appId 和 appSecret
 func GetBaiduTransApiMsg() (string, string) {
 	return "", ""
+}
+
+func SaveConfig() {
+	e := viper.WriteConfig()
+	if e != nil {
+		log.E("配置文件保存失败")
+		log.E(e)
+	}
 }

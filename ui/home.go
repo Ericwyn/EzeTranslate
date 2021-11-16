@@ -105,11 +105,9 @@ func showHomeUi(showAndRun bool) {
 	homeNoteLabel = widget.NewLabel("")
 
 	bottomPanel := container.NewHBox(
-		container.NewHBox(
-			widget.NewButton("翻译当前文字", func() {
-				startTrans()
-			}),
-		),
+		widget.NewButton("翻译当前文字", func() {
+			startTrans()
+		}),
 		widget.NewButton("迷你模式", func() {
 			// 断开 homeUi 的 Closed 回调, 不关闭 app
 			homeWindow.SetOnClosed(func() {})
@@ -121,6 +119,9 @@ func showHomeUi(showAndRun bool) {
 			closeHomeUi()
 			miniTransResBox.SetText(resBoxText)
 			miniNoteLabel.SetText(noteText)
+
+			viper.Set(conf.ConfigKeyMiniMode, true)
+			conf.SaveConfig()
 		}),
 		homeNoteLabel,
 	)
