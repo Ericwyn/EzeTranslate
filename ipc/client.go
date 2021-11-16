@@ -10,6 +10,6 @@ func SendMessage(message string) error {
 	if err != nil {
 		return err
 	}
-	log.D("res-static:", res)
+	log.D("ipc response:", res)
 	return nil
 }

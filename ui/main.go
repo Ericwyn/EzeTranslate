@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/resource/cusWeight"
+	"github.com/Ericwyn/EzeTranslate/resource/cusWidget"
 	"github.com/Ericwyn/EzeTranslate/strutils"
 	"github.com/Ericwyn/EzeTranslate/trans/baidu"
 	"github.com/Ericwyn/EzeTranslate/trans/google"
@@ -81,8 +81,8 @@ func showMainUi() {
 
 	inputBoxPanelTitle := container.NewHBox(
 		widget.NewLabel("翻译设置        "),
-		cusWeight.CreateCheckGroup(
-			[]cusWeight.LabelAndInit{
+		cusWidget.CreateCheckGroup(
+			[]cusWidget.LabelAndInit{
 				{"注释优化", viper.GetBool(conf.ConfigKeyFormatAnnotation)},
 				{"空格优化", viper.GetBool(conf.ConfigKeyFormatSpace)},
 				{"回车优化", viper.GetBool(conf.ConfigKeyFormatCarriageReturn)},
@@ -108,14 +108,15 @@ func showMainUi() {
 
 	inputBox = widget.NewMultiLineEntry()
 	inputBox.SetPlaceHolder(`请输入需要翻译的文字`)
+	inputBox.Wrapping = fyne.TextWrapBreak
 
 	inputBoxPanel = container.NewBorder(inputBoxPanelTitle, nil, nil, nil,
 		container.NewGridWithColumns(1, inputBox))
 
 	transResBoxPanelTitle := container.NewHBox(
 		widget.NewLabel("翻译结果        "),
-		cusWeight.CreateCheckGroup(
-			[]cusWeight.LabelAndInit{
+		cusWidget.CreateCheckGroup(
+			[]cusWidget.LabelAndInit{
 				{"Google", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
 				{"Baidu", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
 				{"Youdao", viper.GetString(conf.ConfigKeyTranslateSelect) == "youdao"},
@@ -141,7 +142,6 @@ func showMainUi() {
 
 	transResBox = widget.NewMultiLineEntry()
 	transResBox.SetPlaceHolder(`等待翻译中...`)
-	//transResBox.Enable()
 	transResBox.Wrapping = fyne.TextWrapBreak
 
 	transResBoxPanel = container.NewBorder(transResBoxPanelTitle, nil, nil, nil,
@@ -187,6 +187,7 @@ func startTrans() {
 		return
 	}
 
+	transResBox.SetText("")
 	transResBox.SetPlaceHolder("正在翻译..........")
 
 	handleTransResult := func(result string, note string) {
@@ -234,9 +235,20 @@ func startUnixSocketServer() {
 
 			selectText := trans.GetSelection()
 			fmt.Println("获取的划词:", selectText)
+
+			if strings.Trim(inputBox.Text, " ") ==
+				strings.Trim(selectText, " ") {
+
+				// 如果翻译框有数据的话，就不进行翻译
+				if strings.Trim(transResBox.Text, " ") != "" {
+					log.D("获取的划词与当前 inputBox 中文字一致，不进行翻译")
+					return
+				}
+
+			}
+
 			// 刷新当前数据
 			inputBox.SetText(selectText)
-
 			startTrans()
 
 			break
