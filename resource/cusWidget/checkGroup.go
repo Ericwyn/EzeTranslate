@@ -1,4 +1,4 @@
-package cusWeight
+package cusWidget
 
 import (
 	"fyne.io/fyne/v2"

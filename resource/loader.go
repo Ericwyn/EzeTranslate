@@ -31,7 +31,8 @@ func GetRunnerPath() string {
 		log.D("程序运行目录:" + runnerPath)
 
 		// 如果运行的目录是在 Temp 下面的话, 那么看看 ./ 目录是什么
-		if strings.Contains(runnerPath, "AppData/Local/Temp") {
+		if strings.Contains(runnerPath, "AppData/Local/Temp") ||
+			strings.HasPrefix(runnerPath, "/tmp") {
 			log.D("程序运行在 Temp 目录")
 			dir, err := filepath.Abs(filepath.Dir("./"))
 			if err != nil {
