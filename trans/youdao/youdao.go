@@ -13,8 +13,8 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
-	"unicode"
 )
 
 const (
@@ -149,15 +149,20 @@ func queryYoudaoApi(from, to, q string) (*youDaoTransResult, error) {
 	}
 	defer response.Body.Close()
 
-	var r youDaoTransResult
-	err = json.NewDecoder(response.Body).Decode(&r)
+	var result youDaoTransResult
+	err = json.NewDecoder(response.Body).Decode(&result)
+
+	// print result JSON
+	s, _ := json.MarshalIndent(result, "", "  ")
+	log.D(string(s))
+
 	if err != nil {
 		return nil, err
 	}
-	if r.ErrorCode != "0" {
-		return nil, getError(r.ErrorCode)
+	if result.ErrorCode != "0" {
+		return nil, getError(result.ErrorCode)
 	}
-	return &r, nil
+	return &result, nil
 }
 
 var errCodeMessageMap = map[string]string{
@@ -195,31 +200,33 @@ func Translate(str string, transCallback trans.TransResCallback) {
 	from := lAuto
 	to := lAuto
 
-	note := ""
-
-	// 判断 str 是否包含中文
-	strLen := 0.0
-	hanLen := 0.0
-
-	for _, c := range str {
-		strLen += 1
-		if unicode.Is(unicode.Han, c) {
-			hanLen += 1
-		}
-	}
-	log.D("总长度:", len(str), "汉字长度:", hanLen)
-
-	percentHan := hanLen / strLen
-	if percentHan > 0.5 {
-		from = lChinese
-		to = lEnglish
-
-		note = "auto -> en"
-	} else {
-		from = lEnglish
-		to = lChinese
-		note = "auto -> zh"
-	}
+	//note := "auto -> auto"
+	//runeStr := []rune(str)
+	//
+	//// 判断 str 是否包含中文
+	//strLen := 0.0
+	//hanLen := 0.0
+	//
+	//strLen += float64(len(runeStr))
+	//
+	//for _, c := range str {
+	//	if unicode.Is(unicode.Han, c) {
+	//		hanLen += 1
+	//	}
+	//}
+	//log.D("总长度:", len(str), "汉字长度:", hanLen)
+	//
+	//percentHan := hanLen / strLen
+	//if percentHan > 0.5 {
+	//	from = lChinese
+	//	to = lEnglish
+	//
+	//	note = "auto -> en"
+	//} else {
+	//	from = lEnglish
+	//	to = lChinese
+	//	note = "auto -> zh"
+	//}
 
 	resJson, e := queryYoudaoApi(from, to, str)
 
@@ -233,5 +240,5 @@ func Translate(str string, transCallback trans.TransResCallback) {
 		transRes += line + "\n"
 	}
 
-	transCallback(transRes, note)
+	transCallback(transRes, strings.Replace(resJson.L, "2", " -> ", 1))
 }
