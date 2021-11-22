@@ -19,6 +19,24 @@ func TestFormatAnnotation(t *testing.T) {
 `))
 }
 
+func TestFormatCamelCaseText(t *testing.T) {
+	a := "hello friends"
+	fmt.Println(a, "->", strutils.FormatCamelCaseText(a))
+
+	b := "requestLocationUpdate"
+	fmt.Println(b, "->", strutils.FormatCamelCaseText(b))
+
+	c := "format_linux_function"
+	fmt.Println(c, "->", strutils.FormatCamelCaseText(c))
+
+	d := "CONFIG_KEY_TRANSLATE"
+	fmt.Println(d, "->", strutils.FormatCamelCaseText(d))
+
+	e := "Con_F_Key"
+	fmt.Println(e, "->", strutils.FormatCamelCaseText(e))
+
+}
+
 func TestGoogleTrans(t *testing.T) {
 	conf.InitConfig()
 

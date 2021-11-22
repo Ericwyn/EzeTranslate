@@ -10,6 +10,7 @@ youdaoTransSecret: youdaoTransAppSecret-xxxxxxxxxxxxxxx
 formatannotation: false
 formatcarriagereturn: false
 formatspace: false
+formatcamelcase: false
 
 # 翻译接口选择, 默认选择 google 接口
 translateSelect: google

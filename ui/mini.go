@@ -5,11 +5,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/resource/cusWidget"
-	"github.com/spf13/viper"
 	"os"
-
-	"github.com/Ericwyn/EzeTranslate/log"
 )
 
 // 迷你翻译页面
@@ -32,59 +28,8 @@ func showMiniUi(showAndRun bool) {
 	})
 	miniWindow.CenterOnScreen()
 
-	miniInputBoxPanelTitle := container.NewHBox(
-		widget.NewLabel("翻译设置        "),
-		cusWidget.CreateCheckGroup(
-			[]cusWidget.LabelAndInit{
-				{"注释优化", viper.GetBool(conf.ConfigKeyFormatAnnotation)},
-				{"空格优化", viper.GetBool(conf.ConfigKeyFormatSpace)},
-				{"回车优化", viper.GetBool(conf.ConfigKeyFormatCarriageReturn)},
-			},
-			true,  // 横向
-			false, // 单选
-			func(label string, checked bool) {
-				if label == "注释优化" {
-					viper.Set(conf.ConfigKeyFormatAnnotation, checked)
-				} else if label == "空格优化" {
-					viper.Set(conf.ConfigKeyFormatSpace, checked)
-				} else if label == "回车优化" {
-					viper.Set(conf.ConfigKeyFormatCarriageReturn, checked)
-				}
-				e := viper.WriteConfig()
-				if e != nil {
-					log.E("配置文件保存失败")
-					log.E(e)
-				}
-			},
-		),
-	)
-
-	miniTransResBoxPanelTitle := container.NewHBox(
-		widget.NewLabel("翻译结果        "),
-		cusWidget.CreateCheckGroup(
-			[]cusWidget.LabelAndInit{
-				{"Google", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
-				{"Baidu", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
-				{"Youdao", viper.GetString(conf.ConfigKeyTranslateSelect) == "youdao"},
-			},
-			true, // 横向
-			true, // 单选
-			func(label string, checked bool) {
-				if label == "Google" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "google")
-				} else if label == "Baidu" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "baidu")
-				} else if label == "Youdao" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "youdao")
-				}
-				e := viper.WriteConfig()
-				if e != nil {
-					log.E("配置文件保存失败")
-					log.E(e)
-				}
-			},
-		),
-	)
+	miniInputBoxPanelTitle := buildFormatCheckBox()
+	miniTransResBoxPanelTitle := buildTransApiCheckBox()
 
 	miniTransResBox = widget.NewMultiLineEntry()
 	miniTransResBox.SetPlaceHolder(`等待翻译中...`)

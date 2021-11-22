@@ -26,6 +26,7 @@
 - 针对代码注释进行格式化
   - 去除 `//` `/*` `#` 之类的符号
   - 去除回车, 多余空格等
+  - 驼峰命名法的变量和函数名翻译
 - 划词翻译 (仅支持 Linux, 需要 xclip )
 - 简约窗口（无菜单/设置等，只有简单卡片显示翻译结果）
 
@@ -56,7 +57,7 @@ sh build.sh
 ### Linux 划词翻译支持
 - 安装 xclip
 - 为 `EzeTranslate -x` 命令设定快捷键
-  - `-x` 参数可以在程序启动之后直接调用 xclip 获取屏幕划词并翻译
+  - 此处 `-x` 参数可以在程序启动之后直接调用 xclip 获取屏幕划词并翻译
 
 
 ## 4. 待实现功能
@@ -67,7 +68,6 @@ sh build.sh
 - All
   - 窗口创建的时候位置跟随鼠标
   - 鼠标移开时候自动退出
-  - 驼峰命名的变量和函数名编译
   - 多个翻译任务的时候, 停止之前的任务
 - ...
 
@@ -75,14 +75,6 @@ sh build.sh
 
 ## Ubuntu 20.04 运行效果
 
-|   启动页面   |   翻译效果   |
-| ---- | ---- |
-|  ![windows](./res-static/screenshot/linux.png)    |   ![windows-2](./res-static/screenshot/linux2.png)   |
-
-
-## Windows 运行效果
-
-|   启动页面   |   翻译效果   |
-| ---- | ---- |
-|  ![windows](./res-static/screenshot/windows.png)    |   ![windows-2](./res-static/screenshot/windows-2.png)   |
-
+|   启动页面   |   翻译效果   |   迷你窗口   |
+| ---- | ---- | ---- |
+|  ![linux](./res-static/screenshot/linux.png)    |   ![linux-2](./res-static/screenshot/linux2.png)   | ![linux-3](./res-static/screenshot/linux3.png)  |

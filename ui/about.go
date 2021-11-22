@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/resource"
+	"github.com/Ericwyn/EzeTranslate/ui/resource"
 	"net/url"
 )
 

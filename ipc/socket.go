@@ -10,8 +10,8 @@ import (
 
 type UnixSocket struct {
 	filename string
-	bufsize  int
 	handler  func(string) string
+	bufSize  int
 }
 
 func NewUnixSocket(filename string, size ...int) *UnixSocket {
@@ -19,13 +19,13 @@ func NewUnixSocket(filename string, size ...int) *UnixSocket {
 	if size != nil {
 		size1 = size[0]
 	}
-	us := UnixSocket{filename: filename, bufsize: size1}
+	us := UnixSocket{filename: filename, bufSize: size1}
 	return &us
 }
 
-func (this *UnixSocket) createServer() {
-	os.Remove(this.filename)
-	addr, err := net.ResolveUnixAddr("unix", this.filename)
+func (socket *UnixSocket) createServer() {
+	os.Remove(socket.filename)
+	addr, err := net.ResolveUnixAddr("unix", socket.filename)
 	if err != nil {
 		panic("Cannot resolve unix addr: " + err.Error())
 	}
@@ -40,48 +40,48 @@ func (this *UnixSocket) createServer() {
 		if err != nil {
 			panic("Accept: " + err.Error())
 		}
-		go this.HandleServerConn(c)
+		go socket.HandleServerConn(c)
 	}
 
 }
 
 //接收连接并处理
-func (this *UnixSocket) HandleServerConn(c net.Conn) {
+func (socket *UnixSocket) HandleServerConn(c net.Conn) {
 	defer c.Close()
-	buf := make([]byte, this.bufsize)
+	buf := make([]byte, socket.bufSize)
 	nr, err := c.Read(buf)
 	if err != nil {
 		panic("Read: " + err.Error())
 	}
 	// 这里，你需要 parse buf 里的数据来决定返回什么给客户端
 	// 假设 respnoseData 是你想返回的文件内容
-	result := this.HandleServerContext(string(buf[0:nr]))
+	result := socket.HandleServerContext(string(buf[0:nr]))
 	_, err = c.Write([]byte(result))
 	if err != nil {
 		panic("Writes failed.")
 	}
 }
 
-func (this *UnixSocket) SetContextHandler(f func(string) string) {
-	this.handler = f
+func (socket *UnixSocket) SetContextHandler(f func(string) string) {
+	socket.handler = f
 }
 
 //接收内容并返回结果
-func (this *UnixSocket) HandleServerContext(context string) string {
-	if this.handler != nil {
-		return this.handler(context)
+func (socket *UnixSocket) HandleServerContext(context string) string {
+	if socket.handler != nil {
+		return socket.handler(context)
 	}
 	now := time.Now().String()
 	return now
 }
 
-func (this *UnixSocket) StartServer() {
-	this.createServer()
+func (socket *UnixSocket) StartServer() {
+	socket.createServer()
 }
 
 //客户端
-func (this *UnixSocket) ClientSendContext(context string) (string, error) {
-	addr, err := net.ResolveUnixAddr("unix", this.filename)
+func (socket *UnixSocket) ClientSendContext(context string) (string, error) {
+	addr, err := net.ResolveUnixAddr("unix", socket.filename)
 	if err != nil {
 		log.D("Cannot resolve unix addr: " + err.Error())
 		return "", err
@@ -99,7 +99,7 @@ func (this *UnixSocket) ClientSendContext(context string) (string, error) {
 		return "", err
 	}
 	//读结果
-	buf := make([]byte, this.bufsize)
+	buf := make([]byte, socket.bufSize)
 	nr, err := c.Read(buf)
 	if err != nil {
 		log.D("Read: " + err.Error())

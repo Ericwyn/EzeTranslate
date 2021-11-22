@@ -5,10 +5,9 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/EzeTranslate/resource/cusWidget"
 	"github.com/spf13/viper"
 	"os"
+	"runtime"
 )
 
 // 翻译入口页面
@@ -34,32 +33,7 @@ func showHomeUi(showAndRun bool) {
 	})
 	homeWindow.CenterOnScreen()
 
-	inputBoxPanelTitle := container.NewHBox(
-		widget.NewLabel("翻译设置        "),
-		cusWidget.CreateCheckGroup(
-			[]cusWidget.LabelAndInit{
-				{"注释优化", viper.GetBool(conf.ConfigKeyFormatAnnotation)},
-				{"空格优化", viper.GetBool(conf.ConfigKeyFormatSpace)},
-				{"回车优化", viper.GetBool(conf.ConfigKeyFormatCarriageReturn)},
-			},
-			true,  // 横向
-			false, // 单选
-			func(label string, checked bool) {
-				if label == "注释优化" {
-					viper.Set(conf.ConfigKeyFormatAnnotation, checked)
-				} else if label == "空格优化" {
-					viper.Set(conf.ConfigKeyFormatSpace, checked)
-				} else if label == "回车优化" {
-					viper.Set(conf.ConfigKeyFormatCarriageReturn, checked)
-				}
-				e := viper.WriteConfig()
-				if e != nil {
-					log.E("配置文件保存失败")
-					log.E(e)
-				}
-			},
-		),
-	)
+	inputBoxPanelTitle := buildFormatCheckBox()
 
 	homeInputBox = widget.NewMultiLineEntry()
 	homeInputBox.SetPlaceHolder(`请输入需要翻译的文字`)
@@ -68,32 +42,7 @@ func showHomeUi(showAndRun bool) {
 	homeInputBoxPanel = container.NewBorder(inputBoxPanelTitle, nil, nil, nil,
 		container.NewGridWithColumns(1, homeInputBox))
 
-	transResBoxPanelTitle := container.NewHBox(
-		widget.NewLabel("翻译结果        "),
-		cusWidget.CreateCheckGroup(
-			[]cusWidget.LabelAndInit{
-				{"Google", viper.GetString(conf.ConfigKeyTranslateSelect) == "google"},
-				{"Baidu", viper.GetString(conf.ConfigKeyTranslateSelect) == "baidu"},
-				{"Youdao", viper.GetString(conf.ConfigKeyTranslateSelect) == "youdao"},
-			},
-			true, // 横向
-			true, // 单选
-			func(label string, checked bool) {
-				if label == "Google" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "google")
-				} else if label == "Baidu" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "baidu")
-				} else if label == "Youdao" {
-					viper.Set(conf.ConfigKeyTranslateSelect, "youdao")
-				}
-				e := viper.WriteConfig()
-				if e != nil {
-					log.E("配置文件保存失败")
-					log.E(e)
-				}
-			},
-		),
-	)
+	transResBoxPanelTitle := buildTransApiCheckBox()
 
 	homeTransResBox = widget.NewMultiLineEntry()
 	homeTransResBox.SetPlaceHolder(`等待翻译中...`)
@@ -108,23 +57,27 @@ func showHomeUi(showAndRun bool) {
 		widget.NewButton("翻译当前文字", func() {
 			startTrans()
 		}),
-		widget.NewButton("迷你模式", func() {
-			// 断开 homeUi 的 Closed 回调, 不关闭 app
-			homeWindow.SetOnClosed(func() {})
-
-			resBoxText := homeTransResBox.Text
-			noteText := homeNoteLabel.Text
-			// 先展示，再关闭
-			showMiniUi(false)
-			closeHomeUi()
-			miniTransResBox.SetText(resBoxText)
-			miniNoteLabel.SetText(noteText)
-
-			viper.Set(conf.ConfigKeyMiniMode, true)
-			conf.SaveConfig()
-		}),
-		homeNoteLabel,
 	)
+	if runtime.GOOS == "linux" {
+		bottomPanel.Add(
+			widget.NewButton("迷你模式", func() {
+				// 断开 homeUi 的 Closed 回调, 不关闭 app
+				homeWindow.SetOnClosed(func() {})
+
+				resBoxText := homeTransResBox.Text
+				noteText := homeNoteLabel.Text
+				// 先展示，再关闭
+				showMiniUi(false)
+				closeHomeUi()
+				miniTransResBox.SetText(resBoxText)
+				miniNoteLabel.SetText(noteText)
+
+				viper.Set(conf.ConfigKeyMiniMode, true)
+				conf.SaveConfig()
+			}),
+		)
+	}
+	bottomPanel.Add(homeNoteLabel)
 
 	mainPanel := container.NewBorder(nil, bottomPanel, nil, nil,
 		container.NewGridWithColumns(1, homeInputBoxPanel, homeTransResBoxPanel))

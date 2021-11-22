@@ -2,7 +2,7 @@ package conf
 
 import (
 	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/EzeTranslate/resource"
+	"github.com/Ericwyn/EzeTranslate/ui/resource"
 	"github.com/spf13/viper"
 )
 
@@ -19,6 +19,7 @@ const ConfigKeyYouDaoTransAppSecret = "youdaoTransAppSecret"
 const ConfigKeyFormatSpace = "formatSpace"
 const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
 const ConfigKeyFormatAnnotation = "formatAnnotation"
+const ConfigKeyFormatCamelCase = "formatCamelCase"
 
 // google, baidu,
 const ConfigKeyTranslateSelect = "translateSelect"
@@ -39,6 +40,7 @@ func InitConfig() {
 	viper.SetDefault(ConfigKeyFormatSpace, false)
 	viper.SetDefault(ConfigKeyFormatCarriageReturn, false)
 	viper.SetDefault(ConfigKeyFormatAnnotation, false)
+	viper.SetDefault(ConfigKeyFormatCamelCase, false)
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
