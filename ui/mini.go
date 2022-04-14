@@ -5,6 +5,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
+	"github.com/spf13/viper"
 	"os"
 )
 
@@ -57,6 +58,8 @@ func showMiniUi(showAndRun bool) {
 			homeTransResBox.SetText(resBoxText)
 			homeNoteLabel.SetText(noteText)
 			homeInputBox.SetText(miniSelectTextNow)
+
+			viper.Set(conf.ConfigKeyMiniMode, false)
 			conf.SaveConfig()
 		}),
 		miniNoteLabel,
