@@ -28,6 +28,7 @@
   - 去除回车, 多余空格等
   - 驼峰命名法的变量和函数名翻译
 - 划词翻译 (仅支持 Linux, 需要 xclip )
+- 英文 OCR 支持 (仅支持 ubuntu，需要 gnome 桌面环境以及 tesseract)
 - 简约窗口（无菜单/设置等，只有简单卡片显示翻译结果）
 
 ## 2. 安装
@@ -58,6 +59,14 @@ sh build.sh
 - 安装 xclip
 - 为 `EzeTranslate -x` 命令设定快捷键
   - 此处 `-x` 参数可以在程序启动之后直接调用 xclip 获取屏幕划词并翻译
+
+### Ubuntu 下英文 OCR 识别支持
+- 暂时只支持 Ubuntu, 需要安装
+- 需要安装 tesseract, ubuntu 可用以下命令安装
+  ```shell
+  sudo apt-get install tesseract-ocr
+  sudo apt-get install tesseract-ocr-eng
+  ```
 
 
 ## 4. 待实现功能
