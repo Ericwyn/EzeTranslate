@@ -1,6 +1,8 @@
 echo "start build"
 fyne package -icon ./res-static/icon/icon.png
 
+go build EzeTranslate.go
+
 echo "copy files to build-target"
 mkdir ./build-target
 

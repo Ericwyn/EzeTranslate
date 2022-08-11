@@ -10,7 +10,7 @@ import (
 
 type UnixSocket struct {
 	filename string
-	handler  func(string) string
+	handler  func(IpcMessage) string
 	bufSize  int
 }
 
@@ -55,19 +55,19 @@ func (socket *UnixSocket) HandleServerConn(c net.Conn) {
 	}
 	// 这里，你需要 parse buf 里的数据来决定返回什么给客户端
 	// 假设 respnoseData 是你想返回的文件内容
-	result := socket.HandleServerContext(string(buf[0:nr]))
+	result := socket.HandleServerContext(IpcMessage(buf[0:nr]))
 	_, err = c.Write([]byte(result))
 	if err != nil {
 		panic("Writes failed.")
 	}
 }
 
-func (socket *UnixSocket) SetContextHandler(f func(string) string) {
+func (socket *UnixSocket) SetContextHandler(f func(IpcMessage) string) {
 	socket.handler = f
 }
 
 //接收内容并返回结果
-func (socket *UnixSocket) HandleServerContext(context string) string {
+func (socket *UnixSocket) HandleServerContext(context IpcMessage) string {
 	if socket.handler != nil {
 		return socket.handler(context)
 	}
@@ -80,7 +80,7 @@ func (socket *UnixSocket) StartServer() {
 }
 
 //客户端
-func (socket *UnixSocket) ClientSendContext(context string) (string, error) {
+func (socket *UnixSocket) ClientSendContext(context IpcMessage) (string, error) {
 	addr, err := net.ResolveUnixAddr("unix", socket.filename)
 	if err != nil {
 		log.D("Cannot resolve unix addr: " + err.Error())

@@ -6,8 +6,9 @@ import (
 )
 
 var xClipFlag = flag.Bool("x", false, "use xclip to get selected text after boot")
+var ocrFlag = flag.Bool("ocr", false, "just ocr only")
 
 func main() {
 	flag.Parse()
-	ui.StartApp(*xClipFlag)
+	ui.StartApp(*xClipFlag, *ocrFlag)
 }

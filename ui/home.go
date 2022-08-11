@@ -5,8 +5,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/EzeTranslate/ocr"
+	"github.com/Ericwyn/EzeTranslate/ipc"
 	"github.com/spf13/viper"
 	"os"
 	"runtime"
@@ -79,13 +78,14 @@ func showHomeUi(showAndRun bool) {
 			}),
 		)
 		bottomPanel.Add(
-			widget.NewButton("OCR 识别", func() {
-				log.D("ocr 识别成功")
-				ocrRes, successFlag := ocr.RunOcr()
-				if successFlag {
-					homeInputBox.SetText(ocrRes)
-					startTrans()
-				}
+			widget.NewButton("OCR 翻译", func() {
+				trySendMessage(ipc.IpcMessageOcrAndTrans)
+				//log.D("ocr 识别成功")
+				//ocrRes, successFlag := ocr.RunOcr()
+				//if successFlag {
+				//	homeInputBox.SetText(ocrRes)
+				//	startTrans()
+				//}
 			}),
 		)
 	}

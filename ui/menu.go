@@ -29,10 +29,13 @@ func createAppMenu() *fyne.MainMenu {
 	})
 	openLogMenuItem.IsQuit = true
 
-	logMenu := fyne.NewMenu("设置", configSetMenuItem, openLogMenuItem)
+	//logMenu := fyne.NewMenu("设置", configSetMenuItem, openLogMenuItem)
 
 	mainMenu := fyne.NewMainMenu(
-		logMenu,
+		fyne.NewMenu("设置",
+			configSetMenuItem,
+			openLogMenuItem,
+		),
 		fyne.NewMenu("关于",
 			fyne.NewMenuItem("版本信息 ", func() {
 				showAboutUi()
