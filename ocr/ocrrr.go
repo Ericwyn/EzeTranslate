@@ -43,6 +43,7 @@ func getOcrTextTempPath() string {
 	return OCRTextTempPath
 }
 
+// RunOcr 运行 OCR 识别文字并返回
 func RunOcr() (string, bool) {
 	if !initFlag {
 		ocrResTempFile := file.OpenFile(getOcrTextTempPath())
@@ -88,7 +89,7 @@ func RunOcr() (string, bool) {
 	return tranRes, true
 }
 
-//获取文件修改时间 返回unix时间戳
+// GetFileModTime 获取文件修改时间 返回unix时间戳
 func GetFileModTime(path string) int64 {
 	f, err := os.Open(path)
 	if err != nil {

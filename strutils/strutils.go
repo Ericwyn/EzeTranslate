@@ -2,6 +2,7 @@ package strutils
 
 import (
 	"github.com/Ericwyn/EzeTranslate/conf"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -52,12 +53,16 @@ func FormatInputBoxText(formatText string) string {
 	}
 	if viper.GetBool(conf.ConfigKeyFormatCamelCase) {
 		// 因为 FormatCamelCaseText 会要求输入的 formatText 符合函数名格式才可以
+		formatText = strings.Replace(formatText, "\r\n", " ", 1)
+		formatText = strings.Replace(formatText, "\r", " ", 1)
+		formatText = strings.Replace(formatText, "\n", " ", 1)
 		formatText = FormatCamelCaseText(formatText)
 	}
 
 	return formatText
 }
 
+// FormatCamelCaseText
 // 将一个驼峰命名的函数名拆开来
 // 将第二个开始的大写字母拆成小写 + 空格
 // 还得判断是否全为大写
@@ -111,6 +116,8 @@ func FormatCamelCaseText(str string) string {
 			res += string(c)
 		}
 	}
+
+	log.D("驼峰优化", str, "->", res)
 
 	return res
 }
