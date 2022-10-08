@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-var maxLogBuffSize = 10
 var logBuff []string = make([]string, 0)
 
 func getLogTimeStr() string {
@@ -17,10 +16,6 @@ func E(out ...interface{}) {
 	log := "[" + getLogTimeStr() + "] [E] " + fmt.Sprint(out...)
 	logBuff = append(logBuff, log)
 
-	if len(logBuff) > maxLogBuffSize {
-		logBuff = logBuff[len(logBuff)-maxLogBuffSize : len(logBuff)-1]
-	}
-
 	fmt.Println(log)
 }
 
@@ -28,9 +23,12 @@ func D(out ...interface{}) {
 	log := "[" + getLogTimeStr() + "] [D] " + fmt.Sprint(out...)
 	logBuff = append(logBuff, log)
 
-	if len(logBuff) > maxLogBuffSize {
-		logBuff = logBuff[len(logBuff)-maxLogBuffSize : len(logBuff)-1]
-	}
+	fmt.Println(log)
+}
+
+func I(out ...interface{}) {
+	log := "[" + getLogTimeStr() + "] [I] " + fmt.Sprint(out...)
+	logBuff = append(logBuff, log)
 
 	fmt.Println(log)
 }

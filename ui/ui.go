@@ -37,7 +37,8 @@ func StartApp(xclip bool, ocr bool) {
 	} else {
 		// 开启 server 监听来自其他进程的翻译请求
 		startUnixSocketServer()
-		sendSocketMessage(xclip, ocr, true)
+		// 此处需要异步，需要等 app 界面起来之后再去做消息发送
+		go sendSocketMessage(xclip, ocr, true)
 		openNewApp()
 	}
 }
@@ -46,19 +47,15 @@ func sendSocketMessage(xclip bool, ocr bool, sleep bool) {
 	// 重新发送一遍参数
 	// 如果启动时候带有参数的话，那么就应该直接获取一遍选中的文字并进行翻译
 	if xclip {
-		go func() {
-			if sleep {
-				time.Sleep(time.Millisecond * 500)
-			}
-			trySendMessage(ipc.IpcMessageNewSelection)
-		}()
+		if sleep {
+			time.Sleep(time.Millisecond * 500)
+		}
+		trySendMessage(ipc.IpcMessageNewSelection)
 	} else if ocr {
-		go func() {
-			if sleep {
-				time.Sleep(time.Millisecond * 500)
-			} // 只获取文字，但是不进行翻译
-			trySendMessage(ipc.IpcMessageOcr)
-		}()
+		if sleep {
+			time.Sleep(time.Millisecond * 500)
+		} // 只获取文字，但是不进行翻译
+		trySendMessage(ipc.IpcMessageOcr)
 	}
 
 }
@@ -132,10 +129,12 @@ func trySendMessage(message ipc.IpcMessage) bool {
 	}
 	err := ipc.SendMessage(message)
 	if err == nil {
-		fmt.Println("已发送给其他翻译进程 : " + string(message))
+		log.D("已发送给其他翻译进程 : " + string(message))
 		return true
+	} else {
+		log.D("IPC 消息发送失败")
+		return false
 	}
-	return false
 }
 
 // 开启一个 UnixSocketServer, 接收 IPC 消息

@@ -25,12 +25,16 @@ func buildFormatCheckBox() *fyne.Container {
 			func(label string, checked bool) {
 				if label == "注释" {
 					viper.Set(conf.ConfigKeyFormatAnnotation, checked)
+					log.I("输入优化: 注释: ", checked)
 				} else if label == "空格" {
 					viper.Set(conf.ConfigKeyFormatSpace, checked)
+					log.I("输入优化: 空格: ", checked)
 				} else if label == "回车" {
 					viper.Set(conf.ConfigKeyFormatCarriageReturn, checked)
+					log.I("输入优化: 回车: ", checked)
 				} else if label == "驼峰" {
 					viper.Set(conf.ConfigKeyFormatCamelCase, checked)
+					log.I("输入优化: 驼峰: ", checked)
 				}
 				conf.SaveConfig()
 			},
