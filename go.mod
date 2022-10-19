@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/Ericwyn/go-googletrans v0.0.0-20221019035537-19b8f12527fb // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/bregydoc/gtranslate v0.0.0-20200913051839-1bd07f6c1fc5
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20211024062804-40e447a793be // indirect

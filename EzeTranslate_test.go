@@ -42,10 +42,12 @@ func TestGoogleTrans(t *testing.T) {
 
 	google.Translate("你好啊", func(result string, note string) {
 		fmt.Println("你好啊 -> " + result)
+		fmt.Println(note)
 	})
 
 	google.Translate("hello", func(result string, note string) {
 		fmt.Println("hello -> " + result)
+		fmt.Println(note)
 	})
 }
 

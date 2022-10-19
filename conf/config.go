@@ -16,14 +16,16 @@ const ConfigKeyBaiduTransAppSecret = "baiduTransAppSecret"
 const ConfigKeyYouDaoTransAppId = "youdaoTransAppId"
 const ConfigKeyYouDaoTransAppSecret = "youdaoTransAppSecret"
 
+const ConfigKeyGoogleTranslateProxy = "googleTranslateProxy"
+const ConfigKeyGoogleTranslateUrl = "googleTranslateUrl"
+
 const ConfigKeyFormatSpace = "formatSpace"
 const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
 const ConfigKeyFormatAnnotation = "formatAnnotation"
 const ConfigKeyFormatCamelCase = "formatCamelCase"
 
-// google, baidu,
+// ConfigKeyTranslateSelect 选择哪个翻译
 const ConfigKeyTranslateSelect = "translateSelect"
-const ConfigKeyGoogleTranslateProxy = "googleTranslateProxy"
 
 func InitConfig() {
 	viper.SetDefault(ConfigKeyMiniMode, false)
@@ -34,7 +36,8 @@ func InitConfig() {
 	viper.SetDefault(ConfigKeyYouDaoTransAppId, "youdaoTransAppId-xxxxxxxxxxxxxxx")
 	viper.SetDefault(ConfigKeyYouDaoTransAppSecret, "youdaoTransAppSecret-xxxxxxxxxxxxxxx")
 
-	viper.SetDefault(ConfigKeyGoogleTranslateProxy, "google.com")
+	viper.SetDefault(ConfigKeyGoogleTranslateProxy, "")
+	viper.SetDefault(ConfigKeyGoogleTranslateUrl, "translate.google.com")
 	viper.SetDefault(ConfigKeyTranslateSelect, "google")
 
 	viper.SetDefault(ConfigKeyFormatSpace, false)
@@ -61,11 +64,12 @@ func printConfigs() {
 		ConfigKeyBaiduTransAppSecret,
 		ConfigKeyYouDaoTransAppId,
 		ConfigKeyYouDaoTransAppSecret,
+		ConfigKeyGoogleTranslateUrl,
+		ConfigKeyGoogleTranslateProxy,
 		ConfigKeyFormatSpace,
 		ConfigKeyFormatCarriageReturn,
 		ConfigKeyFormatAnnotation,
 		ConfigKeyTranslateSelect,
-		ConfigKeyGoogleTranslateProxy,
 	}
 	for _, key := range configList {
 		log.D("config " + key + "  :  " + viper.GetString(key))

@@ -41,8 +41,12 @@ func showSetUi() {
 	youdaoAppSecretEntry.SetText(viper.GetString(conf.ConfigKeyYouDaoTransAppSecret))
 
 	googleTranslateProxyEntry := widget.NewEntry()
-	googleTranslateProxyEntry.SetPlaceHolder("Google 翻译代理地址")
+	googleTranslateProxyEntry.SetPlaceHolder("Google 翻译 Http 代理")
 	googleTranslateProxyEntry.SetText(viper.GetString(conf.ConfigKeyGoogleTranslateProxy))
+
+	googleTranslateUrlEntry := widget.NewEntry()
+	googleTranslateUrlEntry.SetPlaceHolder("Google 翻译服务地址")
+	googleTranslateUrlEntry.SetText(viper.GetString(conf.ConfigKeyGoogleTranslateUrl))
 
 	form := &widget.Form{
 		Items: []*widget.FormItem{
@@ -52,8 +56,8 @@ func showSetUi() {
 			{Text: "有道 AppId    ", Widget: youdaoAppIdEntry, HintText: "请填写从有道处申请到的 AppId"},
 			{Text: "有道 AppSecret", Widget: youdaoAppSecretEntry, HintText: "请填写从有道处申请到的 AppSecret"},
 			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-			{Text: "Google Host", Widget: googleTranslateProxyEntry, HintText: "google 翻译的代理地址, 填写 translate.xxxxx.xxx 后面部分"},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
+			{Text: "Google Url", Widget: googleTranslateUrlEntry, HintText: "google 翻译的服务地址, 默认为 translate.google.com"},
+			{Text: "Http 代理", Widget: googleTranslateProxyEntry, HintText: "google 翻译的 Http 代理, 如 Http://127.0.0.1:1080"},
 		},
 
 		SubmitText: "保存设置",
@@ -65,6 +69,7 @@ func showSetUi() {
 			viper.Set(conf.ConfigKeyYouDaoTransAppId, youdaoAppIdEntry.Text)
 			viper.Set(conf.ConfigKeyYouDaoTransAppSecret, youdaoAppSecretEntry.Text)
 
+			viper.Set(conf.ConfigKeyGoogleTranslateUrl, googleTranslateUrlEntry.Text)
 			viper.Set(conf.ConfigKeyGoogleTranslateProxy, googleTranslateProxyEntry.Text)
 
 			err := viper.WriteConfig()
