@@ -6,7 +6,7 @@
 
 <br>
 
-利用 go 实现的一款 Windows 和 Linux 下通用的翻译小工具
+利用 go 实现的一款 Linux 和 Windows 下通用的翻译小工具（我自己一直在 Ubuntu 下使用）
 
 避免不厌其烦的在 chrome\IDE\PDF 工具上安装翻译拓展...
 
@@ -19,8 +19,9 @@
   - 支持 Baidu 翻译 API
     - 需要在参数设置当中配置 Baidu API 参数
   - 支持 Google 翻译 API
-    - 国内的话, 需要在参数设置当中配置 translate.google.com 的代理
-    - 可以使用 cloudflare worker 做 js proxy
+    - 无需设置 API 参数，但是需要解决网络访问问题
+    - 支持设置 google 翻译地址 (你可以直接做一个 js proxy 来访问)
+    - 支持设置 Http 代理解决访问问题
   - 支持 Youdao 翻译 API
     - 需要在参数设置当中配置 Youdao API 参数
 - 针对代码注释进行格式化
@@ -61,13 +62,13 @@ sh build.sh
   - 此处 `-x` 参数可以在程序启动之后直接调用 xclip 获取屏幕划词并翻译
 
 ### Ubuntu 下英文 OCR 识别支持
-- 暂时只支持 Ubuntu, 需要安装
+- 暂时只支持 Ubuntu, 依赖于 `gnome-screenshot` , 以及 `tesseract`
+  - 实现上直接调用 `gnome-screenshot` 命令行截图，之后再用 `tesseract` 识别
 - 需要安装 tesseract, ubuntu 可用以下命令安装
   ```shell
   sudo apt-get install tesseract-ocr
   sudo apt-get install tesseract-ocr-eng
   ```
-
 
 ## 4. 待实现功能
 - Linux
