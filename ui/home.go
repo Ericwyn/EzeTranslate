@@ -3,9 +3,11 @@ package ui
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/ipc"
+	"github.com/Ericwyn/EzeTranslate/log"
 	"github.com/spf13/viper"
 	"os"
 	"runtime"
@@ -16,11 +18,28 @@ import (
 var homeWindow fyne.Window
 
 var homeInputBoxPanel *fyne.Container
-var homeInputBox *widget.Entry
+var homeInputBox *EzeInputEntry
 
 var homeTransResBoxPanel *fyne.Container
 var homeTransResBox *widget.Entry
 var homeNoteLabel *widget.Label
+
+type EzeInputEntry struct {
+	widget.Entry
+}
+
+func (m *EzeInputEntry) TypedShortcut(s fyne.Shortcut) {
+	if _, ok := s.(*desktop.CustomShortcut); !ok {
+		m.Entry.TypedShortcut(s)
+		return
+	}
+	shortcut := s.(*desktop.CustomShortcut)
+	// 如果是 alt + 回车 / ctrl + 回车，就直接触发翻译
+	if shortcut.KeyName == fyne.KeyReturn &&
+		(shortcut.Modifier == fyne.KeyModifierControl || shortcut.Modifier == fyne.KeyModifierAlt) {
+		startTrans()
+	}
+}
 
 func showHomeUi(showAndRun bool) {
 
@@ -36,7 +55,10 @@ func showHomeUi(showAndRun bool) {
 
 	inputBoxPanelTitle := buildFormatCheckBox()
 
-	homeInputBox = widget.NewMultiLineEntry()
+	homeInputBox = &EzeInputEntry{}
+	homeInputBox.MultiLine = true
+	homeInputBox.Wrapping = fyne.TextTruncate
+	homeInputBox.ExtendBaseWidget(homeInputBox)
 	homeInputBox.SetPlaceHolder(`请输入需要翻译的文字`)
 	homeInputBox.Wrapping = fyne.TextWrapBreak
 
@@ -98,6 +120,11 @@ func showHomeUi(showAndRun bool) {
 
 	homeWindow.SetOnClosed(func() {
 		os.Exit(0)
+	})
+
+	altTab := desktop.CustomShortcut{KeyName: fyne.KeyF, Modifier: fyne.KeyModifierAlt}
+	homeWindow.Canvas().AddShortcut(&altTab, func(shortcut fyne.Shortcut) {
+		log.I("alt + tab")
 	})
 
 	if showAndRun {

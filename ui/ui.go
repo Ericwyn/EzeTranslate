@@ -165,8 +165,8 @@ func startUnixSocketServer() {
 }
 
 // setWindowsFocus 请求焦点
-func setWindowsFocus() (*widget.Entry, *widget.Entry) {
-	var inputBox *widget.Entry
+func setWindowsFocus() (*EzeInputEntry, *widget.Entry) {
+	var inputBox *EzeInputEntry
 	var transResBox *widget.Entry
 
 	if homeWindow != nil {
