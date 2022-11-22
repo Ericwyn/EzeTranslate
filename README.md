@@ -35,7 +35,7 @@
 ## 2. 安装
 
 ### Release 下载
-直接前往 [Release]() 下载即可
+直接前往 [Release](https://github.com/Ericwyn/EzeTranslate/releases) 下载即可
 
 ### 编译安装
 ```shell

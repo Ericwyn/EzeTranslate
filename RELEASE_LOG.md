@@ -1,5 +1,10 @@
 # EzeTranslate Release Log
 
+## V1.4
+- 发布: 2022-11-22
+- 说明
+  1. 新增加 alt/ctrl + enter 快捷键来触发翻译
+
 ## V1.3
 - 发布: 2022-10-19
 - 说明
