@@ -3,6 +3,6 @@ Version=1.0
 Type=Application
 Name=EzeTranslate
 Exec=/opt/EzeTranslate/EzeTranslate
-Icon=EzeTranslate
+Icon=/opt/EzeTranslate/res-static/icon/icon.png
 Terminal=false
 Categories=Utility;

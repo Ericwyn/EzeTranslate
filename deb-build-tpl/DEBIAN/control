@@ -3,6 +3,6 @@ Version: 1.5
 Section: utils
 Priority: optional
 Architecture: amd64
-Depends: xclip
+Depends: xclip, gnome-screenshot, tesseract-ocr, tesseract-ocr-eng
 Maintainer: Ericwyn <Ericwyn.chen@gmail.com>
 Description: EzeTranslate is a translation tool.
