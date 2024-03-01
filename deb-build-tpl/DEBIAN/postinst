@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# 创建符号链接, 使得安装之后可以在命令行调用 EzeTranslate
+ln -sf /opt/EzeTranslate/EzeTranslate /usr/bin/EzeTranslate
+# 创建 icon.png 软链接
+ln -sf /opt/EzeTranslate/res-static/icon/icon.png /usr/share/icons/hicolor/128x128/apps/EzeTranslate.png
+
+exit 0

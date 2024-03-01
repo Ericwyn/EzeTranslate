@@ -1,0 +1,8 @@
+Package: ezetranslate
+Version: 1.5
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: xclip
+Maintainer: Ericwyn <Ericwyn.chen@gmail.com>
+Description: EzeTranslate is a translation tool.

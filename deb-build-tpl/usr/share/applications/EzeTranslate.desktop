@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=EzeTranslate
+Exec=/opt/EzeTranslate/EzeTranslate
+Icon=EzeTranslate
+Terminal=false
+Categories=Utility;

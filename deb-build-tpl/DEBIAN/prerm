@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# 删除符号链接
+rm -f /usr/bin/EzeTranslate
+rm -f /usr/share/icons/hicolor/128x128/apps/EzeTranslate.png
+
+exit 0
