@@ -27,7 +27,7 @@ func showAboutUi() {
 	})
 	aboutWindow.CenterOnScreen()
 
-	icon := canvas.NewImageFromResource(resource.ResourceIcon)
+	icon := canvas.NewImageFromResource(resource.ResourceIcon())
 	icon.SetMinSize(fyne.Size{
 		Width:  60,
 		Height: 60,

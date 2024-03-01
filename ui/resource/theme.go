@@ -21,17 +21,17 @@ func (t *CustomerTheme) Size(name fyne.ThemeSizeName) float32 {
 }
 
 func (*CustomerTheme) Font(s fyne.TextStyle) fyne.Resource {
-	if s.Monospace {
-		return theme.LightTheme().Font(s)
-	}
-	if s.Bold {
-		if s.Italic {
-			return theme.LightTheme().Font(s)
-		}
-		return ResourceFont
-	}
-	if s.Italic {
-		return theme.LightTheme().Font(s)
-	}
-	return ResourceFont
+	//if s.Monospace {
+	//	return theme.LightTheme().Font(s)
+	//}
+	//if s.Bold {
+	//	if s.Italic {
+	//		return theme.LightTheme().Font(s)
+	//	}
+	//	return ResourceFontNoto
+	//}
+	//if s.Italic {
+	//	return theme.LightTheme().Font(s)
+	//}
+	return ResourceFontNoto()
 }

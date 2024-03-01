@@ -63,7 +63,7 @@ func sendSocketMessage(xclip bool, ocr bool, sleep bool) {
 func openNewApp() {
 	// 设置整个 app 的信息
 	mainApp = app.New()
-	mainApp.SetIcon(resource.ResourceIcon)
+	mainApp.SetIcon(resource.ResourceIcon())
 	mainApp.Settings().SetTheme(&resource.CustomerTheme{})
 
 	// 启动主页面
