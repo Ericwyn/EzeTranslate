@@ -35,7 +35,11 @@
 ## 2. 安装
 
 ### Release 下载
-直接前往 [Release](https://github.com/Ericwyn/EzeTranslate/releases) 下载即可
+直接前往 [Release](https://github.com/Ericwyn/EzeTranslate/releases) 下载即可, 提供以下类型安装包
+- 二进制执行文件安装包
+  - 解压之后可直接运行
+- .deb 安装包， 需要 `sudo dpkg -i` 方式安装
+  - ubuntu 22 / ubuntu 20 上测试通过
 
 ### 编译安装
 ```shell

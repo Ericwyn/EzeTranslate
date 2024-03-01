@@ -15,6 +15,13 @@ var runnerPath = ""
 
 func GetRunnerPath() string {
 	if runnerPath == "" {
+		// 如果 /opt/EzeTranslate/config.yaml 存在的话, 优先使用 /opt/EzeTranslate/ 作为 runPath
+		if _, err := os.Stat("/opt/EzeTranslate/config.yaml"); err == nil {
+			runnerPath = "/opt/EzeTranslate/"
+			log.D("程序运行目录:" + runnerPath)
+			return runnerPath
+		}
+
 		//返回绝对路径  filepath.Dir(os.Args[0])去除最后一个元素的路径
 
 		log.D("os.Args[0]:" + os.Args[0])

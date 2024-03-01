@@ -1,4 +1,9 @@
 # EzeTranslate Release Log
+## V1.4
+- 发布: 2024-03-01
+- 说明
+  1. 更新 Fyne 版本
+  2. 支持 debian 安装包
 
 ## V1.4
 - 发布: 2022-11-22

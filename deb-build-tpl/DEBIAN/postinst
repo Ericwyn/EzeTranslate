@@ -3,4 +3,12 @@
 # 创建符号链接, 使得安装之后可以在命令行调用 EzeTranslate
 ln -sf /opt/EzeTranslate/EzeTranslate /usr/bin/EzeTranslate
 
+# 检查 config.yaml 是否存在
+CONFIG_PATH="/opt/EzeTranslate/config.yaml"
+if [ ! -f "$CONFIG_PATH" ]; then
+    # 如果 config.yaml 不存在，则复制或创建文件
+    # 假设您的默认配置文件位于 DEBIAN/config.yaml
+    cp /opt/EzeTranslate/default-config.yaml "$CONFIG_PATH"
+fi
+
 exit 0
