@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-const Version = "V1.4 Release"
-const ReleaseDate = "2022.11.22"
+const Version = "V1.5-Release"
+const ReleaseDate = "2024.03.01"
 
 const ConfigKeyMiniMode = "miniMode"
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
