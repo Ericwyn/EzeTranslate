@@ -58,6 +58,9 @@ func showSetUi() {
 			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
 			{Text: "Google Url", Widget: googleTranslateUrlEntry, HintText: "google 翻译的服务地址, 默认为 translate.google.com"},
 			{Text: "Http 代理", Widget: googleTranslateProxyEntry, HintText: "google 翻译的 Http 代理, 如 Http://127.0.0.1:1080"},
+			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
+			{Text: "配置文件地址", Widget: widget.NewLabel(conf.GetConfigFilePath()), HintText: ""},
+			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
 		},
 
 		SubmitText: "保存设置",

@@ -28,7 +28,6 @@ cp -r "./deb-build-tpl" "$TARGET_DIR/eze-translate"
 mkdir -p "$TARGET_DIR/eze-translate/opt/EzeTranslate"
 
 cp -r "./EzeTranslate" "./res-static" "$TARGET_DIR/eze-translate/opt/EzeTranslate"
-cp "./config.yaml" "$TARGET_DIR/eze-translate/opt/EzeTranslate/default-config.yaml"
 
 # 开始 build deb
 cd "$TARGET_DIR"

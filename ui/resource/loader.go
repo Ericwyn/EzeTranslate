@@ -13,12 +13,15 @@ import (
 var resourceBuf = make(map[string]*fyne.StaticResource)
 var runnerPath = ""
 
+// GetRunnerPath
+// 获取程序运行路径, 这个主要是为了获取程序配置, config.yaml 以及  static 文件路径
+// 这里应该拆分为两个方法
 func GetRunnerPath() string {
 	if runnerPath == "" {
 		// 如果 /opt/EzeTranslate/config.yaml 存在的话, 优先使用 /opt/EzeTranslate/ 作为 runPath
-		if _, err := os.Stat("/opt/EzeTranslate/config.yaml"); err == nil {
+		if _, err := os.Stat("/opt/EzeTranslate/res-static"); err == nil {
 			runnerPath = "/opt/EzeTranslate/"
-			log.D("程序运行目录:" + runnerPath)
+			log.D("[opt] 程序运行目录:" + runnerPath)
 			return runnerPath
 		}
 
@@ -58,7 +61,7 @@ func GetRunnerPath() string {
 func GetResource(resourcePath string) *fyne.StaticResource {
 
 	if resourceBuf[resourcePath] != nil {
-		log.D("load resource :" + resourcePath + " from buf map")
+		//log.D("load resource :" + resourcePath + " from buf map")
 		return resourceBuf[resourcePath]
 	}
 

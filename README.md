@@ -15,6 +15,8 @@
 版本发布日志: [Release Log](RELEASE_LOG.md)
 
 ## 1. 特性
+- 纯 Golang 实现, 由 [Fyne](http://github.com/fyne-io/fyne) 实现 GUI 
+  - 再见 Electron !
 - 支持多个翻译接口，可便捷切换
   - 支持 Baidu 翻译 API
     - 需要在参数设置当中配置 Baidu API 参数
