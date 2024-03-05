@@ -24,10 +24,10 @@ echo ""
 
 # 复制 deb-build-tpl 到 $TARGET_DIR/EzeTranslate-deb 里面
 # 复制 EzeTranslate, config.yaml, res-static/ 到 $TARGET_DIR/EzeTranslate-deb/opt/EzeTranslate/ 里
-cp -r "./deb-build-tpl" "$TARGET_DIR/eze-translate"
-mkdir -p "$TARGET_DIR/eze-translate/opt/EzeTranslate"
+cp -r "./deb-build-tpl" "$TARGET_DIR/eze-translate-${VER_CODE}"
+mkdir -p "$TARGET_DIR/eze-translate-$VER_CODE/opt/EzeTranslate"
 
-cp -r "./EzeTranslate" "./res-static" "$TARGET_DIR/eze-translate/opt/EzeTranslate"
+cp -r "./EzeTranslate" "./res-static" "$TARGET_DIR/eze-translate-${VER_CODE}/opt/EzeTranslate"
 
 # 开始 build deb
 cd "$TARGET_DIR"
@@ -35,7 +35,7 @@ cd "$TARGET_DIR"
 echo "start build debian package in $TARGET_DIR ..."
 echo ""
 
-dpkg-deb --build eze-translate
+dpkg-deb --build eze-translate-${VER_CODE}
 
 echo ""
 echo "build success, target deb file: $TARGET_DIR/eze-translate.deb"

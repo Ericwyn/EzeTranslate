@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-const Version = "V1.5-Release"
+const Version = "V1.6-Release"
 const ReleaseDate = "2024.03.01"
 
 const ConfigKeyMiniMode = "miniMode"
