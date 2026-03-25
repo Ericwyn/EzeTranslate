@@ -14,11 +14,6 @@ import (
 	"strings"
 )
 
-//const (
-//	openaiApiUrl = "https://api.openai.com/v1/chat/completions"
-//	apiKey       = "your_openai_api_key" // 替换为你的 OpenAI API Key
-//)
-
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
@@ -145,8 +140,23 @@ Here is the content
 	}
 }
 
-func doTranslateRequest(inputText string, toLang string) (string, string) {
+func normalizeJSONContent(content string) string {
+	content = strings.TrimSpace(content)
+	content = strings.TrimPrefix(content, "```json")
+	content = strings.TrimPrefix(content, "```")
+	content = strings.TrimSuffix(content, "```")
+	content = strings.TrimSpace(content)
 
+	start := strings.Index(content, "{")
+	end := strings.LastIndex(content, "}")
+	if start >= 0 && end >= start {
+		content = content[start : end+1]
+	}
+
+	return strings.TrimSpace(content)
+}
+
+func doTranslateRequest(inputText string, toLang string) (string, string) {
 	openaiUrl := viper.GetString(conf.ConfigKeyOpenAIApiUrl)
 
 	content, err := GetChatCompletion(buildPromptWithLang(toLang, inputText),
@@ -155,13 +165,13 @@ func doTranslateRequest(inputText string, toLang string) (string, string) {
 		viper.GetString(conf.ConfigKeyOpenAiModel),
 	)
 	if err != nil {
-		//fmt.Println("Error:", err)
 		return "openai 翻译异常: " + err.Error(), ""
 	}
 
-	//fmt.Println("Response:", content)
+	normalizedContent := normalizeJSONContent(content)
+
 	var transResult TransApiRes
-	err = json.Unmarshal([]byte(content), &transResult)
+	err = json.Unmarshal([]byte(normalizedContent), &transResult)
 	if err != nil {
 		return "openai 翻译异常, 数据解析失败: " + content, ""
 	}

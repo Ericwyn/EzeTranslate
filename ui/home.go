@@ -14,8 +14,6 @@ import (
 	"time"
 )
 
-// 翻译入口页面
-
 var homeWindow fyne.Window
 
 var homeInputBoxPanel *fyne.Container
@@ -35,7 +33,6 @@ func (m *EzeInputEntry) TypedShortcut(s fyne.Shortcut) {
 		return
 	}
 	shortcut := s.(*desktop.CustomShortcut)
-	// 如果是 alt + 回车 / ctrl + 回车，就直接触发翻译
 	if shortcut.KeyName == fyne.KeyReturn &&
 		(shortcut.Modifier == fyne.KeyModifierControl || shortcut.Modifier == fyne.KeyModifierAlt) {
 		startTrans()
@@ -43,7 +40,6 @@ func (m *EzeInputEntry) TypedShortcut(s fyne.Shortcut) {
 }
 
 func showHomeUi(showAndRun bool) {
-
 	homeWindow = mainApp.NewWindow("EzeTranslate")
 
 	homeWindow.SetMainMenu(createAppMenu())
@@ -58,7 +54,6 @@ func showHomeUi(showAndRun bool) {
 
 	homeInputBox = &EzeInputEntry{}
 	homeInputBox.MultiLine = true
-	homeInputBox.Wrapping = fyne.TextTruncate
 	homeInputBox.ExtendBaseWidget(homeInputBox)
 	homeInputBox.SetPlaceHolder(`请输入需要翻译的文字`)
 	homeInputBox.Wrapping = fyne.TextWrapBreak
@@ -66,7 +61,6 @@ func showHomeUi(showAndRun bool) {
 	homeInputBoxPanel = container.NewBorder(inputBoxPanelTitle, nil, nil, nil,
 		container.NewGridWithColumns(1, homeInputBox))
 
-	// api 选择
 	transResBoxPanelTitle := buildTransApiCheckBox()
 
 	homeTransResBox = widget.NewMultiLineEntry()
@@ -87,12 +81,10 @@ func showHomeUi(showAndRun bool) {
 	if runtime.GOOS == "linux" {
 		bottomPanel.Add(
 			widget.NewButton("迷你模式", func() {
-				// 断开 homeUi 的 Closed 回调, 不关闭 app
 				homeWindow.SetOnClosed(func() {})
 
 				resBoxText := homeTransResBox.Text
 				noteText := homeNoteLabel.Text
-				// 先展示，再关闭
 				showMiniUi(false)
 				closeHomeUi()
 				miniTransResBox.SetText(resBoxText)
@@ -105,23 +97,16 @@ func showHomeUi(showAndRun bool) {
 		bottomPanel.Add(
 			widget.NewButton("OCR 翻译", func() {
 				trySendMessage(ipc.IpcMessageOcrAndTrans)
-				//log.D("ocr 识别成功")
-				//ocrRes, successFlag := ocr.RunOcr()
-				//if successFlag {
-				//	homeInputBox.SetText(ocrRes)
-				//	startTrans()
-				//}
 			}),
 		)
 	}
 
-	bottomPanel.Add(buildToLangDropDown() /*目标语种选择*/)
+	bottomPanel.Add(buildToLangDropDown())
 	bottomPanel.Add(homeNoteLabel)
 
 	mainPanel := container.NewBorder(nil, bottomPanel, nil, nil,
 		container.NewGridWithColumns(1, homeInputBoxPanel, homeTransResBoxPanel))
 
-	// 尝试延迟 300ms 设置 content, 避免异常尺寸
 	time.Sleep(300 * time.Millisecond)
 
 	homeWindow.SetContent(mainPanel)

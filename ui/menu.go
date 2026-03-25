@@ -7,16 +7,15 @@ import (
 /*
 菜单结构是这样的
 
-- MainMenu
-	Menu1
-		MenuItem-1
-		MenuItem-2
-		MenuItem-3
-	Menu2
-	Menu3
+  - MainMenu
+    Menu1
+    MenuItem-1
+    MenuItem-2
+    MenuItem-3
+    Menu2
+    Menu3
 
 在 Menu1 中, 如果又没有个 MenuItem 的 IsQuit 为 True 的话, 那么会加一个 Quit 的 MenuItem
-
 */
 func createAppMenu() *fyne.MainMenu {
 

@@ -1,15 +1,16 @@
 package conf
 
 import (
-	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/spf13/viper"
 	"os"
 	"path"
+
+	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/spf13/viper"
 )
 
-const Version = "V1.7-Release"
-const ReleaseDate = "2024.07.26"
-const FyneVersion = "v2.5.0"
+const Version = "V1.8-Release"
+const ReleaseDate = "2026.03.25"
+const FyneVersion = "v2.7.3"
 
 const ConfigKeyMiniMode = "miniMode"
 const ConfigKeyBaiduTransAppId = "baiduTransAppId"
@@ -30,10 +31,8 @@ const ConfigKeyFormatCarriageReturn = "formatCarriageReturn"
 const ConfigKeyFormatAnnotation = "formatAnnotation"
 const ConfigKeyFormatCamelCase = "formatCamelCase"
 
-// ConfigKeyTranslateSelect 选择哪个翻译
 const ConfigKeyTranslateSelect = "translateSelect"
 
-// ToLang 翻译的目标语言直接存在内存里面, 每次启动的时候我们默认设置为 ""
 var ToLang = ""
 
 const configFileDirName = "EzeTranslate"
@@ -64,10 +63,7 @@ func InitConfig() {
 
 	viper.SetConfigName(configFileName)
 	viper.SetConfigType(configFileType)
-	//viper.AddConfigPath(resource.GetRunnerPath() + "/.conf")
-	//viper.AddConfigPath(resource.GetRunnerPath())
 
-	// 初始化配置文件
 	GetConfigFilePath()
 
 	viper.AddConfigPath(GetConfigFileDirPath())
@@ -77,16 +73,11 @@ func InitConfig() {
 		log.E("载入配置时候出错")
 		panic(err)
 	}
-	//printConfigs()
 }
 
-// GetConfigFilePath
-// 获取配置文件路径
-// linux 下在 ～/.config/EzeTranslate/config.yaml
 func GetConfigFilePath() string {
 	dir := GetConfigFileDirPath()
 
-	// 如果 dir 不存在的话, 我们就创建
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.MkdirAll(dir, os.ModePerm)
 	}
@@ -95,7 +86,6 @@ func GetConfigFilePath() string {
 
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
 		log.I("创建配置文件:" + configFilePath)
-		// 如果文件不存在的话, 我们就创建
 		f, err := os.Create(configFilePath)
 		if err != nil {
 			log.E("无法创建配置文件")
@@ -110,8 +100,6 @@ func GetConfigFilePath() string {
 	}
 }
 
-// GetConfigFileDirPath
-// 获取配置文件目录
 func GetConfigFileDirPath() string {
 	configDir, err := os.UserConfigDir()
 	if err != nil {
@@ -139,7 +127,6 @@ func printConfigs() {
 	}
 }
 
-// 返回百度翻译 api 的 appId 和 appSecret
 func GetBaiduTransApiMsg() (string, string) {
 	return "", ""
 }

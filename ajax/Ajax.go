@@ -14,7 +14,7 @@ import (
 
 type Method string
 
-//const
+// const
 const POST Method = "POST"
 const GET Method = "GET"
 

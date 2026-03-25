@@ -1,21 +1,26 @@
 package resource
 
-import "fyne.io/fyne/v2"
+import (
+	"fyne.io/fyne/v2"
+	staticres "github.com/Ericwyn/EzeTranslate/res-static"
+)
 
-var resourceIconCache *fyne.StaticResource = nil
+var resourceIconCache *fyne.StaticResource
 
 func ResourceIcon() *fyne.StaticResource {
 	if resourceIconCache != nil {
 		return resourceIconCache
 	}
-	return GetResource(GetRunnerPath() + "/res-static/icon/icon.png")
+	resourceIconCache = fyne.NewStaticResource("icon.png", staticres.IconPNG)
+	return resourceIconCache
 }
 
-var resourceFontCache *fyne.StaticResource = nil
+var resourceFontCache *fyne.StaticResource
 
 func ResourceFontNoto() *fyne.StaticResource {
 	if resourceFontCache != nil {
 		return resourceFontCache
 	}
-	return GetResource(GetRunnerPath() + "/res-static/fonts/NotoSansSC-Medium.ttf")
+	resourceFontCache = fyne.NewStaticResource("NotoSansSC-Medium.ttf", staticres.NotoSansSCMediumTTF)
+	return resourceFontCache
 }

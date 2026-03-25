@@ -45,7 +45,7 @@ func (socket *UnixSocket) createServer() {
 
 }
 
-//接收连接并处理
+// 接收连接并处理
 func (socket *UnixSocket) HandleServerConn(c net.Conn) {
 	defer c.Close()
 	buf := make([]byte, socket.bufSize)
@@ -66,7 +66,7 @@ func (socket *UnixSocket) SetContextHandler(f func(IpcMessage) string) {
 	socket.handler = f
 }
 
-//接收内容并返回结果
+// 接收内容并返回结果
 func (socket *UnixSocket) HandleServerContext(context IpcMessage) string {
 	if socket.handler != nil {
 		return socket.handler(context)
@@ -79,7 +79,7 @@ func (socket *UnixSocket) StartServer() {
 	socket.createServer()
 }
 
-//客户端
+// 客户端
 func (socket *UnixSocket) ClientSendContext(context IpcMessage) (string, error) {
 	addr, err := net.ResolveUnixAddr("unix", socket.filename)
 	if err != nil {

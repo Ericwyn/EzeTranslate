@@ -3,6 +3,6 @@ Version=1.0
 Type=Application
 Name=EzeTranslate
 Exec=/opt/EzeTranslate/EzeTranslate
-Icon=/opt/EzeTranslate/res-static/icon/icon.png
+Icon=/usr/share/pixmaps/EzeTranslate.png
 Terminal=false
 Categories=Utility;

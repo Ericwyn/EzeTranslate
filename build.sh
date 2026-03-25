@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo "start build EzeTranslate"
 echo ""
 
@@ -17,8 +19,7 @@ echo "Current Time: $CURRENT_TIME"
 TARGET_DIR="./build-target/${VER_CODE}_linux_${CURRENT_TIME}"
 mkdir -p "$TARGET_DIR"
 
-# 将 ./EzeTranslate, ./res-static/ ,./config.yaml 都复制到 ./build-target/VER_CODE_{yy/MM/dd_HH_mm_ss}/
-cp -r "./EzeTranslate" "./res-static" "./config.yaml" "$TARGET_DIR/"
+cp -r "./EzeTranslate" "$TARGET_DIR/"
 
 echo "Build and packaging completed successfully."
 echo ""
