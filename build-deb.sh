@@ -10,7 +10,9 @@ echo "build EzeTranslate success"
 echo ""
 
 VER_CODE=$("./EzeTranslate" -v)
+DEB_VERSION=$(printf '%s' "$VER_CODE" | sed -E 's/^[Vv]//; s/[^0-9A-Za-z.+~-]+/-/g')
 echo "Version Code: $VER_CODE"
+echo "Deb Version: $DEB_VERSION"
 
 CURRENT_TIME=$(date +"%y%m%d%H%M%S")
 echo "Current Time: $CURRENT_TIME"
@@ -24,6 +26,7 @@ echo ""
 cp -r "./deb-build-tpl" "$TARGET_DIR/eze-translate-${VER_CODE}"
 mkdir -p "$TARGET_DIR/eze-translate-$VER_CODE/opt/EzeTranslate"
 mkdir -p "$TARGET_DIR/eze-translate-$VER_CODE/usr/share/pixmaps"
+sed -i "s/^Version: .*/Version: ${DEB_VERSION}/" "$TARGET_DIR/eze-translate-${VER_CODE}/DEBIAN/control"
 
 cp -r "./EzeTranslate" "$TARGET_DIR/eze-translate-${VER_CODE}/opt/EzeTranslate"
 cp "./res-static/icon/icon.png" "$TARGET_DIR/eze-translate-${VER_CODE}/usr/share/pixmaps/EzeTranslate.png"
