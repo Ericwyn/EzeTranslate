@@ -2,6 +2,10 @@ package ui
 
 import (
 	"fmt"
+	"runtime"
+	"strings"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
@@ -18,9 +22,6 @@ import (
 	"github.com/Ericwyn/EzeTranslate/ui/resource"
 	"github.com/Ericwyn/GoTools/shell"
 	"github.com/spf13/viper"
-	"runtime"
-	"strings"
-	"time"
 )
 
 var mainApp fyne.App
@@ -76,6 +77,12 @@ func openNewApp() {
 }
 
 func startTrans() {
+	fyne.Do(func() {
+		startTransInner()
+	})
+}
+
+func startTransInner() {
 
 	// 针对不同模式有不同的获取 formatText 的方法
 	var formatText string
@@ -109,8 +116,10 @@ func startTrans() {
 
 	handleTransResult := func(result string, note string) {
 		fmt.Println("翻译结果:", result)
-		resBox.SetText(result)
-		resNoteLabel.SetText(note)
+		fyne.Do(func() {
+			resBox.SetText(result)
+			resNoteLabel.SetText(note)
+		})
 	}
 
 	var toLang = strutils.Lang(conf.ToLang)
@@ -154,11 +163,13 @@ func startUnixSocketServer() {
 		case ipc.IpcMessagePing:
 			break
 		case ipc.IpcMessageOcr:
-			setOcrTextToInputBox()
+			setOcrTextToInputBox(func(text string, success bool) {})
 		case ipc.IpcMessageOcrAndTrans:
-			if setOcrTextToInputBox() {
-				startTrans()
-			}
+			setOcrTextToInputBox(func(text string, success bool) {
+				if success {
+					startTrans()
+				}
+			})
 			break
 		case ipc.IpcMessageNewSelection:
 			if setSelectTextToInputBox() {
@@ -176,11 +187,15 @@ func setWindowsFocus() (*EzeInputEntry, *widget.Entry) {
 
 	if homeWindow != nil {
 		// 请求焦点
-		homeWindow.RequestFocus()
+		fyne.Do(func() {
+			homeWindow.RequestFocus()
+		})
 		inputBox = homeInputBox
 		transResBox = homeTransResBox
 	} else if miniWindow != nil {
-		miniWindow.RequestFocus()
+		fyne.Do(func() {
+			miniWindow.RequestFocus()
+		})
 		transResBox = miniTransResBox
 	}
 	return inputBox, transResBox
@@ -212,18 +227,34 @@ func setSelectTextToInputBox() bool {
 	return true
 }
 
-func setOcrTextToInputBox() bool {
-	inputBox, transResBox := setWindowsFocus()
+type setOcrTestCallback func(text string, success bool)
 
-	if homeWindow != nil {
-		homeWindow.Hide()
-	} else if miniWindow != nil {
-		miniWindow.Hide()
-	}
+func setOcrTextToInputBox(setOcrTestCallback setOcrTestCallback) {
+	// 获取组件指针（仅获取指针，不读取内部属性，是安全的）
+	var inputBox *EzeInputEntry
+	var transResBox *widget.Entry
+	fyne.Do(func() {
+		inputBox, transResBox = setWindowsFocus()
+		if homeWindow != nil {
+			homeWindow.Hide()
+		} else if miniWindow != nil {
+			miniWindow.Hide()
+		}
+	})
+
 	time.Sleep(300 * time.Millisecond)
 
-	ocrRes, successFlag := ocr.RunOcr()
+	ocr.RunOcr(func(ocrRes string, successFlag bool) {
+		fyne.Do(func() {
+			handlerOcrResult(inputBox, transResBox, ocrRes, successFlag, setOcrTestCallback)
+		})
+	})
+}
 
+func handlerOcrResult(inputBox *EzeInputEntry, transResBox *widget.Entry,
+	ocrRes string, successFlag bool,
+	setOcrTestCallback setOcrTestCallback) {
+	// 恢复窗口显示
 	if homeWindow != nil {
 		homeWindow.Show()
 		homeWindow.RequestFocus()
@@ -232,33 +263,51 @@ func setOcrTextToInputBox() bool {
 		miniWindow.RequestFocus()
 	}
 
-	if successFlag {
-		log.D("获取的 OCR: " + ocrRes)
-		ocrRes = strutils.FormatInputBoxText(ocrRes)
-		homeInputBox.SetText(ocrRes)
-	} else {
+	// 识别失败处理
+	if !successFlag {
 		log.E("ocr 识别失败")
-		return false
+		if setOcrTestCallback != nil {
+			setOcrTestCallback("", false)
+		}
+		return
+	}
+
+	// 识别成功，格式化文本并更新
+	log.D("获取的 OCR: " + ocrRes)
+	ocrRes = strutils.FormatInputBoxText(ocrRes)
+	if homeInputBox != nil {
+		homeInputBox.SetText(ocrRes)
 	}
 
 	miniSelectTextNow = ocrRes
 
-	if inputBox != nil && strings.Trim(inputBox.Text, " ") ==
-		strings.Trim(ocrRes, " ") {
-
-		// 如果翻译框有数据的话，就不进行翻译
-		if transResBox != nil && strings.Trim(transResBox.Text, " ") != "" {
-			log.D("获取的划词与当前 homeInputBox 中文字一致，不进行翻译")
-			return false
-		}
-	}
-
+	// 💡 核心安全点：在 fyne.Do 内部安全地读取 inputBox.Text
 	if inputBox != nil {
+		currentInputText := inputBox.Text // 安全读取
+		var currentTransText string
+		if transResBox != nil {
+			currentTransText = transResBox.Text // 安全读取
+		}
+
+		if strings.Trim(currentInputText, " ") == strings.Trim(ocrRes, " ") {
+			// 如果翻译框有数据的话，就不进行翻译
+			if strings.Trim(currentTransText, " ") != "" {
+				log.D("获取的划词与当前 homeInputBox 中文字一致，不进行翻译")
+				if setOcrTestCallback != nil {
+					setOcrTestCallback("", false)
+				}
+				return
+			}
+		}
+
 		// 刷新当前数据
 		inputBox.SetText(ocrRes)
 	}
 
-	return true
+	// 所有的 UI 逻辑都在这上面安全结束了，触发外部回调
+	if setOcrTestCallback != nil {
+		setOcrTestCallback(ocrRes, true)
+	}
 }
 
 func closeMiniWindow() {

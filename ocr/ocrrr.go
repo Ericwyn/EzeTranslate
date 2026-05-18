@@ -44,8 +44,10 @@ func getOcrTextTempPath() string {
 	return OCRTextTempPath
 }
 
+type OcrCallback func(text string, success bool)
+
 // RunOcr 运行 OCR 识别文字并返回
-func RunOcr() (string, bool) {
+func RunOcr(callback OcrCallback) {
 	if !initFlag {
 		getOcrTextTempPath()
 		ScrPng = OCRTextTempPath + ".png"
@@ -66,12 +68,13 @@ func RunOcr() (string, bool) {
 
 	if math.Abs((float64)(modTime-time.Now().Unix())) > 10 {
 		fmt.Println("文件未修改，不做识别")
-		return "", false
+		callback("", false)
+		return
 	}
 
 	shell.RunShellRes("mogrify", "-modulate", "100,0", "-resize", "400%", ScrPng)
 
-	tranRes := shell.RunShellRes("tesseract", ScrPng, "stdout", "-l", "eng")
+	tranRes := shell.RunShellRes("tesseract", ScrPng, "stdout", "-l", "chi_sim+eng")
 
 	tranRes = strings.Trim(tranRes, " ")
 	tranRes = strings.Trim(tranRes, "\n")
@@ -89,7 +92,7 @@ func RunOcr() (string, bool) {
 	//	shell.RunShellRes("notify-send", "OCRTextTempPath 成功")
 	//}
 
-	return tranRes, true
+	callback(tranRes, true)
 }
 
 // GetFileModTime 获取文件修改时间 返回unix时间戳

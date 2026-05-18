@@ -5,13 +5,8 @@
       "files": [
         "ocr/ocrrr.go",
         "ui/ui.go",
-        ".vscode/changelists.json",
-        "build.sh",
-        "build.bat",
-        "build-deb.sh",
-        ".github/workflows/build.yml",
         ".gitignore",
-        "AGENTS.md"
+        ".vscode/changelists.json"
       ]
     }
   ],
