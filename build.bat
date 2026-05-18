@@ -4,7 +4,7 @@ setlocal
 echo start build EzeTranslate
 echo.
 
-go build EzeTranslate.go
+go build -trimpath -ldflags="-s -w" EzeTranslate.go
 if errorlevel 1 exit /b %errorlevel%
 
 for /f %%i in ('EzeTranslate.exe -v') do set VER_CODE=%%i

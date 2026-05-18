@@ -215,7 +215,22 @@ func setSelectTextToInputBox() bool {
 func setOcrTextToInputBox() bool {
 	inputBox, transResBox := setWindowsFocus()
 
+	if homeWindow != nil {
+		homeWindow.Hide()
+	} else if miniWindow != nil {
+		miniWindow.Hide()
+	}
+	time.Sleep(300 * time.Millisecond)
+
 	ocrRes, successFlag := ocr.RunOcr()
+
+	if homeWindow != nil {
+		homeWindow.Show()
+		homeWindow.RequestFocus()
+	} else if miniWindow != nil {
+		miniWindow.Show()
+		miniWindow.RequestFocus()
+	}
 
 	if successFlag {
 		log.D("获取的 OCR: " + ocrRes)

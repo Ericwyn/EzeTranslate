@@ -77,7 +77,7 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
-        run: go build -ldflags="-s -w" -o "${{ matrix.output_name }}" EzeTranslate.go
+        run: go build -trimpath -ldflags="-s -w" -o "${{ matrix.output_name }}" EzeTranslate.go
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

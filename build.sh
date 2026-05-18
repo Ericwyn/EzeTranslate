@@ -5,7 +5,7 @@ set -e
 echo "start build EzeTranslate"
 echo ""
 
-go build EzeTranslate.go
+go build -trimpath -ldflags="-s -w" EzeTranslate.go
 
 # 执行 ./EzeTranslate -v, 获取一个版本号 VER_CODE
 VER_CODE=$("./EzeTranslate" -v)

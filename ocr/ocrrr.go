@@ -2,18 +2,19 @@ package ocr
 
 import (
 	"fmt"
-	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/GoTools/file"
-	"github.com/Ericwyn/GoTools/shell"
 	"math"
 	"os"
 	"os/user"
 	"strings"
 	"time"
+
+	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/Ericwyn/GoTools/file"
+	"github.com/Ericwyn/GoTools/shell"
 )
 
 var OCRTextTempPath = ""
-var ScrPng = OCRTextTempPath + ".png"
+var ScrPng = ""
 
 var initFlag = false
 
@@ -46,7 +47,9 @@ func getOcrTextTempPath() string {
 // RunOcr 运行 OCR 识别文字并返回
 func RunOcr() (string, bool) {
 	if !initFlag {
-		ocrResTempFile := file.OpenFile(getOcrTextTempPath())
+		getOcrTextTempPath()
+		ScrPng = OCRTextTempPath + ".png"
+		ocrResTempFile := file.OpenFile(OCRTextTempPath)
 		if !ocrResTempFile.IsFile() {
 			ocrResTempFile.CreateFile()
 			_ = ocrResTempFile.Close()

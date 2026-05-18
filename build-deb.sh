@@ -5,7 +5,7 @@ set -e
 echo "start build EzeTranslate debian package"
 echo ""
 
-go build EzeTranslate.go
+go build -trimpath -ldflags="-s -w" EzeTranslate.go
 echo "build EzeTranslate success"
 echo ""
 
