@@ -1,26 +1,43 @@
 package resource
 
 import (
-	"fyne.io/fyne/v2"
+	"bytes"
+	"image"
+	"image/draw"
+	_ "image/png"
+
+	"github.com/Ericwyn/EzeTranslate/log"
 	staticres "github.com/Ericwyn/EzeTranslate/res-static"
+	"github.com/vivaui/viva/app"
 )
 
-var resourceIconCache *fyne.StaticResource
+var windowIconCache *app.WindowIcon
 
-func ResourceIcon() *fyne.StaticResource {
-	if resourceIconCache != nil {
-		return resourceIconCache
+// WindowIcon 把内嵌的 icon.png 解码成 Viva 需要的 RGBA WindowIcon。
+func WindowIcon() app.WindowIcon {
+	if windowIconCache != nil {
+		return *windowIconCache
 	}
-	resourceIconCache = fyne.NewStaticResource("icon.png", staticres.IconPNG)
-	return resourceIconCache
-}
 
-var resourceFontCache *fyne.StaticResource
-
-func ResourceFontNoto() *fyne.StaticResource {
-	if resourceFontCache != nil {
-		return resourceFontCache
+	icon := app.WindowIcon{}
+	img, _, err := image.Decode(bytes.NewReader(staticres.IconPNG))
+	if err != nil {
+		log.E("解码应用图标失败: ", err)
+		windowIconCache = &icon
+		return icon
 	}
-	resourceFontCache = fyne.NewStaticResource("NotoSansSC-Medium.ttf", staticres.NotoSansSCMediumTTF)
-	return resourceFontCache
+
+	b := img.Bounds()
+	// 统一转成正方形 RGBA（取宽高中较大者，居中贴图）
+	side := b.Dx()
+	if b.Dy() > side {
+		side = b.Dy()
+	}
+	rgba := image.NewRGBA(image.Rect(0, 0, side, side))
+	offset := image.Pt((side-b.Dx())/2, (side-b.Dy())/2)
+	draw.Draw(rgba, b.Add(offset), img, b.Min, draw.Src)
+
+	icon = app.WindowIcon{Size: side, RGBA: rgba.Pix}
+	windowIconCache = &icon
+	return icon
 }

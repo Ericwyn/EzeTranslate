@@ -1,116 +1,168 @@
 package ui
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
 	"github.com/Ericwyn/EzeTranslate/conf"
 	"github.com/Ericwyn/EzeTranslate/log"
 	"github.com/spf13/viper"
+
+	"github.com/vivaui/viva/app"
+	"github.com/vivaui/viva/flex"
+	"github.com/vivaui/viva/ui"
 )
 
-var setWindow fyne.Window
-var setWindowsOpening = false
+// setField 把一个单行输入框与它对应的配置键绑定起来。
+type setFieldDef struct {
+	box   *editBox
+	label string
+	hint  string
+	key   string
+}
 
-func showSetUi() {
-	if setWindowsOpening {
-		setWindow.RequestFocus()
+// setState 持有设置窗口的全部输入框状态。
+type setState struct {
+	view       flex.View
+	inv        *app.Invalidator
+	fields     []*setFieldDef
+	configPath string // 打开窗口时取一次，避免 Paint 每帧调用 GetConfigFilePath（有副作用/日志）
+}
+
+var set *setState
+
+// 设置窗各字段标识
+var (
+	setBaiduIdID      = tree.ID(setFeat, "baiduId")
+	setBaiduSecretID  = tree.ID(setFeat, "baiduSecret")
+	setYoudaoIdID     = tree.ID(setFeat, "youdaoId")
+	setYoudaoSecretID = tree.ID(setFeat, "youdaoSecret")
+	setGoogleUrlID    = tree.ID(setFeat, "googleUrl")
+	setGoogleProxyID  = tree.ID(setFeat, "googleProxy")
+	setOpenaiUrlID    = tree.ID(setFeat, "openaiUrl")
+	setOpenaiKeyID    = tree.ID(setFeat, "openaiKey")
+	setOpenaiModelID  = tree.ID(setFeat, "openaiModel")
+	setScrollID       = tree.ID(setFeat, "scroll")
+)
+
+// openSetWindow 打开参数设置窗口；已打开则前置。
+func (a *ezeApp) openSetWindow() {
+	if a.setWin != nil && !a.setWin.Closed() {
+		a.setWin.Show()
 		return
 	}
 
-	setWindow = mainApp.NewWindow("程序设置")
-	setWindow.Resize(fyne.Size{
-		Width: 500,
-		//Height: 600,
-	})
-	setWindow.CenterOnScreen()
+	// 用当前配置初始化各输入框（单行 editBox，支持 Ctrl+A 全选）
+	set = &setState{inv: &app.Invalidator{}}
+	set.fields = []*setFieldDef{
+		{newSingleLineEditBox(setBaiduIdID), "百度 AppId", "请填写从百度处申请到的 AppId", conf.ConfigKeyBaiduTransAppId},
+		{newSingleLineEditBox(setBaiduSecretID), "百度 AppSecret", "请填写从百度处申请到的 AppSecret", conf.ConfigKeyBaiduTransAppSecret},
+		{newSingleLineEditBox(setYoudaoIdID), "有道 AppId", "请填写从有道处申请到的 AppId", conf.ConfigKeyYouDaoTransAppId},
+		{newSingleLineEditBox(setYoudaoSecretID), "有道 AppSecret", "请填写从有道处申请到的 AppSecret", conf.ConfigKeyYouDaoTransAppSecret},
+		{newSingleLineEditBox(setGoogleUrlID), "Google Url", "默认 https://translate.googleapis.com", conf.ConfigKeyGoogleTranslateUrl},
+		{newSingleLineEditBox(setGoogleProxyID), "Http 代理", "如 http://127.0.0.1:1080", conf.ConfigKeyGoogleTranslateProxy},
+		{newSingleLineEditBox(setOpenaiUrlID), "OpenAI Url", "默认 https://api.openai.com/v1/chat/completions", conf.ConfigKeyOpenAIApiUrl},
+		{newSingleLineEditBox(setOpenaiKeyID), "OpenAI Key", "OpenAI 的接口 Key", conf.ConfigKeyOpenAiKey},
+		{newSingleLineEditBox(setOpenaiModelID), "OpenAI Model", "OpenAI 的接口模型", conf.ConfigKeyOpenAiModel},
+	}
+	for _, fd := range set.fields {
+		fd.box.SetText(viper.GetString(fd.key))
+	}
+	set.configPath = conf.GetConfigFilePath()
 
-	baiduAppIdEntry := widget.NewEntry()
-	baiduAppIdEntry.SetPlaceHolder("百度翻译 AppId")
-	baiduAppIdEntry.SetText(viper.GetString(conf.ConfigKeyBaiduTransAppId))
-
-	baiduAppSecretEntry := widget.NewEntry()
-	baiduAppSecretEntry.SetPlaceHolder("百度翻译 AppSecret")
-	baiduAppSecretEntry.SetText(viper.GetString(conf.ConfigKeyBaiduTransAppSecret))
-
-	youdaoAppIdEntry := widget.NewEntry()
-	youdaoAppIdEntry.SetPlaceHolder("有道翻译 AppId")
-	youdaoAppIdEntry.SetText(viper.GetString(conf.ConfigKeyYouDaoTransAppId))
-
-	youdaoAppSecretEntry := widget.NewEntry()
-	youdaoAppSecretEntry.SetPlaceHolder("有道翻译 AppSecret")
-	youdaoAppSecretEntry.SetText(viper.GetString(conf.ConfigKeyYouDaoTransAppSecret))
-
-	googleTranslateProxyEntry := widget.NewEntry()
-	googleTranslateProxyEntry.SetPlaceHolder("Google 翻译 Http 代理")
-	googleTranslateProxyEntry.SetText(viper.GetString(conf.ConfigKeyGoogleTranslateProxy))
-
-	googleTranslateUrlEntry := widget.NewEntry()
-	googleTranslateUrlEntry.SetPlaceHolder("Google 翻译服务地址")
-	googleTranslateUrlEntry.SetText(viper.GetString(conf.ConfigKeyGoogleTranslateUrl))
-
-	openAIApiUrlEntry := widget.NewEntry()
-	openAIApiUrlEntry.SetPlaceHolder("OpenAI 的接口地址")
-	openAIApiUrlEntry.SetText(viper.GetString(conf.ConfigKeyOpenAIApiUrl))
-
-	openAIApiKeyEntry := widget.NewEntry()
-	openAIApiKeyEntry.SetPlaceHolder("OpenAI 的 Key")
-	openAIApiKeyEntry.SetText(viper.GetString(conf.ConfigKeyOpenAiKey))
-
-	openAIApiModelEntry := widget.NewEntry()
-	openAIApiModelEntry.SetPlaceHolder("OpenAI 的模型")
-	openAIApiModelEntry.SetText(viper.GetString(conf.ConfigKeyOpenAiModel))
-
-	form := &widget.Form{
-		Items: []*widget.FormItem{
-			{Text: "百度 AppId    ", Widget: baiduAppIdEntry, HintText: "请填写从百度处申请到的 AppId"},
-			{Text: "百度 AppSecret", Widget: baiduAppSecretEntry, HintText: "请填写从百度处申请到的 AppSecret"},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-			{Text: "有道 AppId    ", Widget: youdaoAppIdEntry, HintText: "请填写从有道处申请到的 AppId"},
-			{Text: "有道 AppSecret", Widget: youdaoAppSecretEntry, HintText: "请填写从有道处申请到的 AppSecret"},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-			{Text: "Google Url", Widget: googleTranslateUrlEntry, HintText: "google 翻译的服务地址, 默认为 https://translate.googleapis.com"},
-			{Text: "Http 代理", Widget: googleTranslateProxyEntry, HintText: "google 翻译的 Http 代理, 如 Http://127.0.0.1:1080"},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-			{Text: "OpenAI Url", Widget: openAIApiUrlEntry, HintText: "OpenAI 的接口地址, 默认为 https://api.openai.com/v1/chat/completions"},
-			{Text: "OpenAI Key", Widget: openAIApiKeyEntry, HintText: "OpenAI 的接口 Key"},
-			{Text: "OpenAI Model", Widget: openAIApiModelEntry, HintText: "OpenAI 的接口模型"},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-			{Text: "配置文件地址", Widget: widget.NewLabel(conf.GetConfigFilePath()), HintText: ""},
-			{Text: "", Widget: widget.NewLabel(""), HintText: ""},
-		},
-
-		SubmitText: "保存设置",
-		OnSubmit: func() {
-			log.D("保存设置")
-			viper.Set(conf.ConfigKeyBaiduTransAppId, baiduAppIdEntry.Text)
-			viper.Set(conf.ConfigKeyBaiduTransAppSecret, baiduAppSecretEntry.Text)
-
-			viper.Set(conf.ConfigKeyYouDaoTransAppId, youdaoAppIdEntry.Text)
-			viper.Set(conf.ConfigKeyYouDaoTransAppSecret, youdaoAppSecretEntry.Text)
-
-			viper.Set(conf.ConfigKeyGoogleTranslateUrl, googleTranslateUrlEntry.Text)
-			viper.Set(conf.ConfigKeyGoogleTranslateProxy, googleTranslateProxyEntry.Text)
-
-			viper.Set(conf.ConfigKeyOpenAIApiUrl, openAIApiUrlEntry.Text)
-			viper.Set(conf.ConfigKeyOpenAiKey, openAIApiKeyEntry.Text)
-			viper.Set(conf.ConfigKeyOpenAiModel, openAIApiModelEntry.Text)
-
-			err := viper.WriteConfig()
-			if err != nil {
-				log.E("保存设置时候发生错误")
+	theme := ui.LightTheme()
+	config := app.Config{
+		Tree:        &tree,
+		Title:       "程序设置",
+		Icon:        appIcon,
+		Width:       520,
+		Height:      600,
+		Origin:      centeredOrigin(520, 600),
+		ClearColor:  clearColor(theme),
+		Invalidator: set.inv,
+		TextInput: func(ctx app.TextInputContext) *app.TextInput {
+			var holder app.TextInput
+			for _, fd := range set.fields {
+				if in := fd.box.textInput(ctx, &holder); in != nil {
+					return in
+				}
 			}
-			// 点击保存之后返回
-			setWindowsOpening = false
-			setWindow.Close()
+			return nil
+		},
+		OnShortcut: a.setOnShortcut,
+		OnScroll: func(e ui.ScrollEvent) ui.EventResult {
+			return set.view.Wheel(e)
 		},
 	}
+	config.Paint = func(canvas *ui.Canvas, size ui.Size) {
+		a.paintSet(canvas, size, theme)
+	}
+	config.OnClosed = func() {
+		a.setWin = nil
+	}
 
-	setWindow.SetContent(form)
+	win, err := a.application.OpenWindow(config, new(ui.Canvas))
+	if err != nil {
+		log.E("打开设置窗口失败: ", err)
+		return
+	}
+	a.setWin = win
+}
 
-	setWindow.SetOnClosed(func() {
-		setWindowsOpening = false
+// setOnShortcut 处理设置窗的 Ctrl+A：对聚焦的字段全选。
+func (a *ezeApp) setOnShortcut(e ui.KeyEvent) ui.EventResult {
+	if (e.Text == "a" || e.Text == "A") && (e.Modifiers&ui.ModifierControl != 0 || e.Modifiers&ui.ModifierMeta != 0) {
+		for _, fd := range set.fields {
+			if e.Target == fd.box.id {
+				fd.box.selectAll()
+				return ui.EventResult{Handled: true, Repaint: true}
+			}
+		}
+	}
+	return ui.EventResult{}
+}
+
+func (a *ezeApp) paintSet(canvas *ui.Canvas, size ui.Size, theme ui.Theme) {
+	bounds := ui.Rect{Width: size.Width, Height: size.Height}
+	canvas.Fill(bounds, theme.Background)
+
+	set.view.Draw(canvas, theme, bounds, func(f *flex.Frame) {
+		f.Column().Fill().Pad(16).Gap(10).Children(func() {
+			f.Text("程序设置").FontSize(20).Bold()
+
+			f.ScrollArea(setScrollID).Grow(1).Gap(10).Children(func() {
+				for _, fd := range set.fields {
+					box := fd.box
+					label := fd.label
+					hint := fd.hint
+					f.Column().Gap(3).Children(func() {
+						f.Text(label)
+						box.paintSingle(f, canvas, label, hint).FillWidth()
+						f.Text(hint).FontSize(11).Muted()
+					})
+				}
+
+				f.Text("配置文件地址").Muted()
+				f.Text(set.configPath).FontSize(12)
+			})
+
+			f.Row().Children(func() {
+				if f.Button(setSaveBtnID, "保存设置").Clicked() {
+					a.saveSet()
+				}
+			})
+		})
 	})
+}
 
-	setWindowsOpening = true
-	setWindow.Show()
+// saveSet 保存设置并关闭窗口。
+func (a *ezeApp) saveSet() {
+	log.D("保存设置")
+	for _, fd := range set.fields {
+		viper.Set(fd.key, fd.box.Text())
+	}
+	if err := viper.WriteConfig(); err != nil {
+		log.E("保存设置时候发生错误")
+	}
+	if a.setWin != nil {
+		a.setWin.Close()
+		a.setWin = nil
+	}
 }

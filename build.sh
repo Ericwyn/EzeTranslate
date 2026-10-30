@@ -2,8 +2,13 @@
 
 set -e
 
-echo "start build EzeTranslate"
+echo "start build EzeTranslate (Viva, GPU-native)"
 echo ""
+
+# go.mod 要求 Go 1.26+，若系统 go 较旧，GOTOOLCHAIN=auto 会自动下载匹配工具链。
+# Viva 的 Linux 后端在运行时 dlopen 系统 XCB/Vulkan，构建无需 cgo。
+export GOTOOLCHAIN=auto
+export CGO_ENABLED=0
 
 go build -trimpath -ldflags="-s -w" EzeTranslate.go
 

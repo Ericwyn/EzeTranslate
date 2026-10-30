@@ -5,3 +5,6 @@ EzeTranslate
 .agents
 .idea
 .vscode
+.trae
+/viva-spike/build/
+/viva-spike/viva-spike

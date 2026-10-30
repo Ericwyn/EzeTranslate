@@ -3,6 +3,7 @@ Version: 1.9
 Section: utils
 Priority: optional
 Architecture: amd64
-Depends: xclip, gnome-screenshot, tesseract-ocr, tesseract-ocr-eng
+Depends: libvulkan1, libxcb1, libpangocairo-1.0-0, xclip, gnome-screenshot, tesseract-ocr, tesseract-ocr-eng
+Recommends: mesa-vulkan-drivers
 Maintainer: Ericwyn <Ericwyn.chen@gmail.com>
 Description: EzeTranslate is a translation tool.

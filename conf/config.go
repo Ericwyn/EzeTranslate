@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-const Version = "V1.9-Release"
-const ReleaseDate = "2026.05.18"
+const Version = "V2.0.0-Release"
+const ReleaseDate = "2026.10.30"
 const FyneVersion = "v2.7.3"
 
 const ConfigKeyMiniMode = "miniMode"

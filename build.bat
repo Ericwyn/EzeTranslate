@@ -1,8 +1,13 @@
 @echo off
 setlocal
 
-echo start build EzeTranslate
+echo start build EzeTranslate (Viva, GPU-native)
 echo.
+
+rem go.mod 要求 Go 1.26+，若系统 go 较旧，GOTOOLCHAIN=auto 会自动下载匹配工具链。
+rem Viva 的 Windows 后端在运行时加载系统 Direct3D 11/DirectWrite，构建无需 cgo。
+set GOTOOLCHAIN=auto
+set CGO_ENABLED=0
 
 go build -trimpath -ldflags="-s -w" EzeTranslate.go
 if errorlevel 1 exit /b %errorlevel%
