@@ -2,7 +2,6 @@ package ui
 
 import (
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/ipc"
 	"github.com/spf13/viper"
 
 	"github.com/vivaui/viva/app"
@@ -86,7 +85,7 @@ func (a *ezeApp) paintMini(canvas *ui.Canvas, size ui.Size, theme ui.Theme) {
 					a.switchToHome()
 				}
 				if f.Button(miniOcrBtnID, "OCR").Outline().Clicked() {
-					trySendMessage(ipc.IpcMessageOcrAndTrans)
+					go a.runOcr(true)
 				}
 				f.Spacer()
 				a.buildLangSelect(f)

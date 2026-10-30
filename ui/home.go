@@ -4,7 +4,6 @@ import (
 	"runtime"
 
 	"github.com/Ericwyn/EzeTranslate/conf"
-	"github.com/Ericwyn/EzeTranslate/ipc"
 	"github.com/spf13/viper"
 
 	"github.com/vivaui/viva/app"
@@ -142,7 +141,7 @@ func (a *ezeApp) paintHome(canvas *ui.Canvas, size ui.Size, theme ui.Theme) {
 						a.switchToMini()
 					}
 					if f.Button(homeOcrBtnID, "OCR 翻译").Outline().Clicked() {
-						trySendMessage(ipc.IpcMessageOcrAndTrans)
+						go a.runOcr(true)
 					}
 				}
 				f.Spacer()

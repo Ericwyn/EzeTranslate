@@ -304,29 +304,41 @@ func (a *ezeApp) onNewSelection() {
 func (a *ezeApp) runOcr(alsoTranslate bool) {
 	post := a.activePost()
 
-	// 隐藏当前窗口，避免遮挡截图
-	post(func() { a.hideActive() })
-	time.Sleep(300 * time.Millisecond)
+	// 隐藏当前窗口，避免遮挡截图。
+	// Viva 的 Window.Hide/Show 会自行投递到窗口事件循环（源码注释
+	// "may be called anywhere"），可从任意 goroutine 直接调用；
+	// 这里必须直接调而不是走 post(Invalidate+OnWake)，否则窗口空闲时
+	// 隐藏会被推迟到截图之后，导致截图里仍有主窗口。
+	a.hideActive()
+	// 留出时间让窗口从屏幕移除后再截图
+	time.Sleep(400 * time.Millisecond)
 
-	ocr.RunOcr(func(ocrRes string, success bool) {
-		post(func() {
+	ocr.RunOcrWithHook(
+		// 截图一完成就恢复窗口，不等后续的 mogrify + tesseract 识别，
+		// 把窗口隐藏时间压到只覆盖「框选截图」这一小段。
+		func() {
 			a.showActive()
-			a.focusActive()
-			if !success {
-				log.E("ocr 识别失败")
-				return
-			}
-			ocrRes = strutils.FormatInputBoxText(ocrRes)
-			log.D("获取的 OCR: " + ocrRes)
-			a.trans.selectNow = ocrRes
-			if a.homeWin != nil && !a.homeWin.Closed() {
-				a.trans.input.SetText(ocrRes)
-			}
-			if alsoTranslate {
-				a.startTrans()
-			}
-		})
-	})
+		},
+		func(ocrRes string, success bool) {
+			// 识别结果涉及 model 状态，放到窗口线程（post）里处理以保证 Paint 线程安全。
+			post(func() {
+				a.focusActive()
+				if !success {
+					log.E("ocr 识别失败")
+					return
+				}
+				ocrRes = strutils.FormatInputBoxText(ocrRes)
+				log.D("获取的 OCR: " + ocrRes)
+				a.trans.selectNow = ocrRes
+				if a.homeWin != nil && !a.homeWin.Closed() {
+					a.trans.input.SetText(ocrRes)
+				}
+				if alsoTranslate {
+					a.startTrans()
+				}
+			})
+		},
+	)
 }
 
 // activePost 返回当前活动窗口对应的投递函数。

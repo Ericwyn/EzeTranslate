@@ -48,6 +48,13 @@ type OcrCallback func(text string, success bool)
 
 // RunOcr 运行 OCR 识别文字并返回
 func RunOcr(callback OcrCallback) {
+	RunOcrWithHook(nil, callback)
+}
+
+// RunOcrWithHook 与 RunOcr 相同，但在「截图完成、即将开始识别」之间调用
+// onCaptured（若非 nil）。调用方可借此在耗时的识别开始前先恢复窗口显示，
+// 避免窗口隐藏时间过长。onCaptured 在截图失败时不会被调用。
+func RunOcrWithHook(onCaptured func(), callback OcrCallback) {
 	if !initFlag {
 		getOcrTextTempPath()
 		ScrPng = OCRTextTempPath + ".png"
@@ -70,6 +77,11 @@ func RunOcr(callback OcrCallback) {
 		fmt.Println("文件未修改，不做识别")
 		callback("", false)
 		return
+	}
+
+	// 截图已完成，后续 mogrify + tesseract 较慢，先让调用方恢复窗口
+	if onCaptured != nil {
+		onCaptured()
 	}
 
 	shell.RunShellRes("mogrify", "-modulate", "100,0", "-resize", "400%", ScrPng)
