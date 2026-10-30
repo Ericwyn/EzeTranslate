@@ -1,6 +1,0 @@
-[app]
-name = "viva-spike"
-id = "dev.example.viva-spike"
-version = "0.1.0"
-executable = "viva-spike"
-package = "."

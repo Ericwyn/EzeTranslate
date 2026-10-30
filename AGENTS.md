@@ -81,7 +81,7 @@ log/                     # 日志模块
 ajax/                    # HTTP 工具
 res-static/              # 嵌入式静态资源（字体、图标）
   embed.go               # go:embed 声明
-viva-spike/              # Viva 技术验证 demo（独立 module，replace 指向主模块，可独立 viva dev）
+VIVA-update.md           # Fyne→Viva 迁移实战指南（可行性/踩坑/改动清单，供后续类似迁移参考）
 ```
 
 ---
