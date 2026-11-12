@@ -18,6 +18,10 @@ type transState struct {
 	note    string // 结果说明，如 "zh->en"
 	loading bool
 
+	// 后台翻译只发布字符串，editor/排版/鼠标选区在 OnWake 中更新。
+	pendingResult string
+	resultPending bool
+
 	selectNow string // 最近一次划词/OCR 文本，用于模式切换时回填输入框
 
 	homeInv *app.Invalidator
@@ -40,16 +44,30 @@ func newTransState() *transState {
 func (t *transState) setLoading() {
 	t.mu.Lock()
 	t.loading = true
+	t.pendingResult = ""
+	t.resultPending = true
 	t.mu.Unlock()
-	t.result.SetText("")
 }
 
 func (t *transState) setResult(result, note string) {
 	t.mu.Lock()
 	t.loading = false
 	t.note = note
+	t.pendingResult = result
+	t.resultPending = true
 	t.mu.Unlock()
-	t.result.SetText(result)
+}
+
+// applyResult 仅由窗口线程调用，避免翻译回调与鼠标拖选同时修改 editor。
+func (t *transState) applyResult() {
+	t.mu.Lock()
+	result, pending := t.pendingResult, t.resultPending
+	t.pendingResult = ""
+	t.resultPending = false
+	t.mu.Unlock()
+	if pending {
+		t.result.SetText(result)
+	}
 }
 
 func (t *transState) setNote(note string) {

@@ -1,17 +1,34 @@
 package trans
 
 import (
-	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/GoTools/shell"
+	"os"
+	"os/exec"
 	"strings"
 	"unicode"
+
+	"github.com/Ericwyn/EzeTranslate/log"
+	"github.com/Ericwyn/GoTools/shell"
 )
 
 type TransResCallback func(result string, note string)
 
 // 获取选择的文字
 func GetSelection() string {
-	return shell.RunShellRes("xclip", "-out")
+	// Prefer the native Wayland primary-selection client when available, then
+	// fall back to XWayland/X11 xclip. Do not read the clipboard as a fallback:
+	// that could translate stale clipboard contents instead of the selection.
+	if os.Getenv("WAYLAND_DISPLAY") != "" {
+		if output, err := exec.Command("wl-paste", "--primary", "--no-newline").Output(); err == nil && len(output) > 0 {
+			return string(output)
+		}
+	}
+
+	output, err := exec.Command("xclip", "-out", "-selection", "primary").Output()
+	if err != nil {
+		log.E("读取系统选区失败（请检查 xclip / Wayland 选区支持）: ", err)
+		return ""
+	}
+	return string(output)
 }
 
 // 翻译文字

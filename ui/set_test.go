@@ -46,6 +46,7 @@ func TestSetFieldSelectAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewDriver: %v", err)
 	}
+	t.Cleanup(driver.Close)
 	_ = driver.Resize(520, 600)
 
 	// 聚焦该字段

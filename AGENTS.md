@@ -8,9 +8,9 @@
 |------|-----|
 | 项目名 | EzeTranslate |
 | 语言 | Go 1.26+（go.mod 声明 1.26，Viva 要求） |
-| GUI 框架 | Viva v0.2.0（`github.com/vivaui/viva`，GPU 原生，无 WebView） |
+| GUI 框架 | Viva v0.2.4（`github.com/vivaui/viva`，GPU 原生，无 WebView） |
 | 模块路径 | `github.com/Ericwyn/EzeTranslate` |
-| 当前版本 | V1.9-Release |
+| 当前版本 | V2.0.2-Release |
 | 支持平台 | Linux（X11）、Windows |
 
 一款纯 Go 实现的桌面翻译工具，支持 Google / Baidu / Youdao / OpenAI 四个翻译引擎，具备划词翻译（Linux xclip）和 OCR 截图翻译（Ubuntu GNOME）功能。
@@ -201,6 +201,7 @@ Release 时自动上传产物到 GitHub Release。
 | OCR 截图翻译 | 仅 Ubuntu + GNOME，需安装 `gnome-screenshot`、`tesseract-ocr`、`imagemagick`（mogrify） |
 | 中文输入法 | Linux 经 IBus / Fcitx5 的 IBus 前端（Viva 实验阶段，预编辑下划线位置可能偏移） |
 | 输入法中英切换 | Viva v0.2 X11 IME 后端尚未打通切换键（Shift / Ctrl+Space 等），应用层无法处理，需用系统输入法自带全局切换键 |
-| Ctrl+Enter 触发翻译 | 多行输入框下 Enter（含带修饰键）被 Viva 文本层当换行吃掉，不进 OnKey/OnShortcut，故不提供回车类翻译快捷键，统一用「执行翻译」按钮 |
-| Ctrl+A 全选 | Viva Linux 文本层未内建 select-all；应用对自管 editor 的输入框（home 输入框、设置窗字段）在 OnShortcut 里手动实现 Ctrl+A 全选 |
+| Ctrl+Enter 触发翻译 | Viva v0.2.4 起多行框先把 Ctrl/Meta+Enter 交给 OnShortcut；home 输入框通过此回调触发翻译，普通 Enter / Shift+Enter 仍换行，翻译中不重复请求 |
+| 文本选择与复制 | home/mini 结果框保持只读，通过 TextareaLayout.OffsetAt + OnPointer 实现鼠标拖选，OnShortcut 支持 Ctrl/Meta+A 全选和 Ctrl/Meta+C 复制；后台结果在 OnWake 中更新 editor，避免与选区操作并发 |
+| Ctrl+A 全选 | 自管 editor 的 home 输入框、设置窗字段和结果框在 OnShortcut 中提供全选回退；原生文本服务已处理时优先使用原生行为 |
 | Windows 剪贴板监听 | 待实现 |

@@ -64,17 +64,19 @@ sh build.sh
 
 ### Linux 划词翻译支持
 - 安装 xclip
+- Wayland 会话建议额外安装 `wl-clipboard`，用于读取 Wayland PRIMARY 选区；未安装时回退到 xclip/XWayland。
 - 为 `EzeTranslate -x` 命令设定快捷键
   - 此处 `-x` 参数可以在程序启动之后直接调用 xclip 获取屏幕划词并翻译
 
 ### Ubuntu 下英文 OCR 识别支持
-- 暂时只支持 Ubuntu, 依赖于 `gnome-screenshot` , 以及 `tesseract`
-  - 实现上直接调用 `gnome-screenshot` 命令行截图，之后再用 `tesseract` 识别
+- 依赖桌面截图服务和 `tesseract`：Wayland 使用 XDG Desktop Portal，X11 使用 `gnome-screenshot`
 - 需要安装 tesseract, ubuntu 可用以下命令安装
   ```shell
   sudo apt-get install tesseract-ocr
   sudo apt-get install tesseract-ocr-eng
   ```
+- 简体中文识别可选安装 `tesseract-ocr-chi-sim`。程序会按已安装的语言包选择 OCR 语言；`mogrify`（ImageMagick）仅用于可选的图片预处理，不再是 OCR 必需依赖。
+- Wayland 会话通过 XDG Desktop Portal 发起交互式截图；支持区域目标的 portal 会直接框选，否则会打开桌面支持的交互式截图流程。X11 会话仍使用 `gnome-screenshot`。
 
 ## 4. 待实现功能
 - Linux

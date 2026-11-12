@@ -2,7 +2,10 @@ module github.com/Ericwyn/EzeTranslate
 
 go 1.26
 
-require github.com/Ericwyn/GoTools v0.0.0-20211108121535-2f9dd1d84942
+require (
+	github.com/Ericwyn/GoTools v0.0.0-20211108121535-2f9dd1d84942
+	github.com/godbus/dbus/v5 v5.2.2
+)
 
 require (
 	github.com/ebitengine/purego v0.11.1 // indirect
@@ -27,5 +30,5 @@ require (
 
 require (
 	github.com/spf13/viper v1.9.0
-	github.com/vivaui/viva v0.2.0
+	github.com/vivaui/viva v0.2.4
 )

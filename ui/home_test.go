@@ -39,6 +39,7 @@ func TestHomeRenders(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewDriver: %v", err)
 	}
+	t.Cleanup(driver.Close)
 	if err := driver.Resize(450, 600); err != nil {
 		t.Fatalf("Resize: %v", err)
 	}
@@ -51,6 +52,7 @@ func TestHomeRenders(t *testing.T) {
 
 	// 模拟一次翻译结果（中文显示）
 	a.trans.setResult("Hello world 这是中英文混排结果", "zh->en")
+	a.trans.homeInv.Invalidate()
 
 	_ = driver.Resize(450, 600)
 	labels := labelText(driver.Snapshot())
@@ -68,15 +70,16 @@ func TestHomeRenders(t *testing.T) {
 // 不直接断言翻译结果，避免在无网络/无 xclip 的测试环境触发真实翻译。
 func TestHomeKeyDispatch(t *testing.T) {
 	a := newTestApp()
+	a.trans.setLoading() // 验证派发且不发起真实请求；加载中仍应拦截快捷键防止插入换行。
 
 	// Ctrl+Enter 应被完整模式识别为翻译快捷键
-	res := a.homeOnKey(ui.KeyEvent{Key: ui.KeyEnter, Modifiers: ui.ModifierControl})
+	res := a.homeOnKey(ui.KeyEvent{Target: homeInputID, Key: ui.KeyEnter, Modifiers: ui.ModifierControl})
 	if !res.Handled {
 		t.Errorf("Ctrl+Enter 应被处理为翻译快捷键")
 	}
 
 	// Alt+Enter 同样应被识别
-	res = a.homeOnKey(ui.KeyEvent{Key: ui.KeyEnter, Modifiers: ui.ModifierAlt})
+	res = a.homeOnKey(ui.KeyEvent{Target: homeInputID, Key: ui.KeyEnter, Modifiers: ui.ModifierAlt})
 	if !res.Handled {
 		t.Errorf("Alt+Enter 应被处理为翻译快捷键")
 	}
@@ -104,6 +107,7 @@ func TestHomeCtrlASelectsAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewDriver: %v", err)
 	}
+	t.Cleanup(driver.Close)
 	if err := driver.Resize(450, 600); err != nil {
 		t.Fatalf("Resize: %v", err)
 	}

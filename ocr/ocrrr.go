@@ -2,47 +2,13 @@ package ocr
 
 import (
 	"fmt"
-	"math"
 	"os"
-	"os/user"
+	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/Ericwyn/EzeTranslate/log"
-	"github.com/Ericwyn/GoTools/file"
-	"github.com/Ericwyn/GoTools/shell"
 )
-
-var OCRTextTempPath = ""
-var ScrPng = ""
-
-var initFlag = false
-
-func getOcrTextTempPath() string {
-	if OCRTextTempPath != "" {
-		return OCRTextTempPath
-	}
-	current, err := user.Current()
-	if err != nil {
-		return ""
-	}
-	homePath := current.HomeDir
-	log.D("homePath :", homePath)
-
-	//"/home/mi/Pictures/ocr-temp"
-	picPath := homePath + "/Pictures/"
-	log.D("picPath :", picPath)
-
-	dir := file.OpenFile(picPath)
-	if !dir.IsDir() {
-		dir.Mkdirs()
-	}
-
-	OCRTextTempPath = picPath + "/ocr-temp"
-	log.D("OCRTextTempPath :", OCRTextTempPath)
-
-	return OCRTextTempPath
-}
 
 type OcrCallback func(text string, success bool)
 
@@ -55,26 +21,45 @@ func RunOcr(callback OcrCallback) {
 // onCaptured（若非 nil）。调用方可借此在耗时的识别开始前先恢复窗口显示，
 // 避免窗口隐藏时间过长。onCaptured 在截图失败时不会被调用。
 func RunOcrWithHook(onCaptured func(), callback OcrCallback) {
-	if !initFlag {
-		getOcrTextTempPath()
-		ScrPng = OCRTextTempPath + ".png"
-		ocrResTempFile := file.OpenFile(OCRTextTempPath)
-		if !ocrResTempFile.IsFile() {
-			ocrResTempFile.CreateFile()
-			_ = ocrResTempFile.Close()
-		}
-		initFlag = true
+	if callback == nil {
+		return
 	}
 
-	shell.Debug(true)
+	// Use a fresh temporary file so cancelling/failing the screenshot cannot
+	// accidentally OCR an old image left by a previous run.
+	image, err := os.CreateTemp("", "ezetranslate-ocr-*.png")
+	if err != nil {
+		log.E("创建 OCR 临时图片失败: ", err)
+		callback("", false)
+		return
+	}
+	screenshotPath := image.Name()
+	if err := image.Close(); err != nil {
+		_ = os.Remove(screenshotPath)
+		log.E("关闭 OCR 临时图片失败: ", err)
+		callback("", false)
+		return
+	}
+	_ = os.Remove(screenshotPath)
+	defer os.Remove(screenshotPath)
 
-	shell.RunShellRes("gnome-screenshot", "-a", "-f", ScrPng)
-
-	// 获取文件修改时间，看看是不是1s内修改的
-	modTime := GetFileModTime(ScrPng)
-
-	if math.Abs((float64)(modTime-time.Now().Unix())) > 10 {
-		fmt.Println("文件未修改，不做识别")
+	var captureErr error
+	if shouldUseScreenshotPortal() {
+		captureErr = capturePortalScreenshot(screenshotPath)
+	} else {
+		output, err := exec.Command("gnome-screenshot", "-a", "-f", screenshotPath).CombinedOutput()
+		if err != nil {
+			captureErr = fmt.Errorf("gnome-screenshot: %w: %s", err, strings.TrimSpace(string(output)))
+		}
+	}
+	if captureErr != nil {
+		log.E("截图失败: ", captureErr)
+		callback("", false)
+		return
+	}
+	info, err := os.Stat(screenshotPath)
+	if err != nil || !info.Mode().IsRegular() || info.Size() == 0 {
+		log.E("gnome-screenshot 未生成有效图片: ", err)
 		callback("", false)
 		return
 	}
@@ -84,43 +69,69 @@ func RunOcrWithHook(onCaptured func(), callback OcrCallback) {
 		onCaptured()
 	}
 
-	shell.RunShellRes("mogrify", "-modulate", "100,0", "-resize", "400%", ScrPng)
+	// ImageMagick is optional. Debian packages do not always include it; OCR
+	// should still proceed with the original screenshot when mogrify is absent.
+	if _, err := exec.LookPath("mogrify"); err == nil {
+		if output, err := exec.Command("mogrify", "-modulate", "100,0", "-resize", "400%", screenshotPath).CombinedOutput(); err != nil {
+			log.E("mogrify 失败，改用原始截图: ", err, " ", strings.TrimSpace(string(output)))
+		}
+	}
 
-	tranRes := shell.RunShellRes("tesseract", ScrPng, "stdout", "-l", "chi_sim+eng")
+	language, err := tesseractLanguage()
+	if err != nil {
+		log.E("Tesseract 语言包不可用: ", err)
+		callback("", false)
+		return
+	}
+	output, err := exec.Command("tesseract", screenshotPath, "stdout", "-l", language).CombinedOutput()
+	if err != nil {
+		log.E("tesseract 识别失败: ", err, " ", strings.TrimSpace(string(output)))
+		callback("", false)
+		return
+	}
+	tranRes := strings.TrimSpace(string(output))
 
-	tranRes = strings.Trim(tranRes, " ")
-	tranRes = strings.Trim(tranRes, "\n")
-	tranRes = strings.Trim(tranRes, "\r")
-	tranRes = strings.Trim(tranRes, "\n\f")
-
-	//fmt.Println(tranRes)
-	//
-	//// 复制内容到剪切板
-	//err := clipboard.WriteAll(tranRes)
-	//
-	//if err != nil {
-	//	shell.RunShellRes("notify-send", "设置剪贴板错误")
-	//} else {
-	//	shell.RunShellRes("notify-send", "OCRTextTempPath 成功")
-	//}
-
+	if tranRes == "" {
+		callback("", false)
+		return
+	}
 	callback(tranRes, true)
 }
 
-// GetFileModTime 获取文件修改时间 返回unix时间戳
+// GetFileModTime 获取文件修改时间并返回 Unix 时间戳。
 func GetFileModTime(path string) int64 {
-	f, err := os.Open(path)
+	info, err := os.Stat(path)
 	if err != nil {
-		log.E("open file error")
+		log.E("stat fileinfo error: ", err)
 		return time.Now().Unix()
 	}
-	defer f.Close()
+	return info.ModTime().Unix()
+}
 
-	fi, err := f.Stat()
+func tesseractLanguage() (string, error) {
+	output, err := exec.Command("tesseract", "--list-langs").CombinedOutput()
 	if err != nil {
-		log.E("stat fileinfo error")
-		return time.Now().Unix()
+		return "", fmt.Errorf("无法读取语言包列表: %w: %s", err, strings.TrimSpace(string(output)))
 	}
+	available := make(map[string]bool)
+	for _, line := range strings.Split(string(output), "\n") {
+		language := strings.TrimSpace(line)
+		if language != "" && !strings.HasPrefix(language, "List of available languages") {
+			available[language] = true
+		}
+	}
+	return selectTesseractLanguage(available)
+}
 
-	return fi.ModTime().Unix()
+func selectTesseractLanguage(available map[string]bool) (string, error) {
+	switch {
+	case available["chi_sim"] && available["eng"]:
+		return "chi_sim+eng", nil
+	case available["eng"]:
+		return "eng", nil
+	case available["chi_sim"]:
+		return "chi_sim", nil
+	default:
+		return "", fmt.Errorf("未安装 eng 或 chi_sim 语言包")
+	}
 }

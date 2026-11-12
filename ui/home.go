@@ -37,6 +37,7 @@ func (a *ezeApp) homeConfig(theme ui.Theme) app.Config {
 		OnWake:     a.drainHome,
 		OnKey:      a.homeOnKey,
 		OnShortcut: a.homeOnShortcut,
+		OnPointer:  a.trans.result.handlePointer,
 		OnScroll: func(e ui.ScrollEvent) ui.EventResult {
 			// 结果框通常更长、更可能溢出，滚轮优先作用于它；
 			// 输入框较短，可用方向键按视觉行移动光标。
@@ -70,25 +71,33 @@ func (a *ezeApp) openHomeWindow() error {
 	return nil
 }
 
-// homeOnKey 处理完整模式下的按键：Ctrl/Alt+Enter 触发翻译，其余交给输入框。
+// homeOnKey 处理完整模式下的按键：Ctrl/Alt+Enter 触发翻译，其余交给文本框。
 func (a *ezeApp) homeOnKey(e ui.KeyEvent) ui.EventResult {
-	if e.Key == ui.KeyEnter && (e.Modifiers&ui.ModifierControl != 0 || e.Modifiers&ui.ModifierAlt != 0) {
-		a.startTrans()
+	if e.Target == homeInputID && e.Key == ui.KeyEnter && e.Modifiers&(ui.ModifierControl|ui.ModifierMeta|ui.ModifierAlt) != 0 {
+		if !a.trans.isLoading() {
+			a.startTrans()
+		}
 		return ui.EventResult{Handled: true, Repaint: true}
 	}
-	return a.trans.input.handleKey(e)
+	if result := a.trans.input.handleKey(e); result.Handled {
+		return result
+	}
+	return a.trans.result.handleKey(e)
 }
 
-// homeOnShortcut 处理 Ctrl/Meta 修饰的可打印快捷键：
-// Ctrl+A 在输入框聚焦时全选输入框内容。
+// homeOnShortcut 在原生多行编辑器处理 Enter 之前接收 Ctrl/Meta+Enter。
+// Viva v0.2.4 起走此路径，不能只放在 OnKey 里，否则会被文本服务当作换行。
 func (a *ezeApp) homeOnShortcut(e ui.KeyEvent) ui.EventResult {
-	if (e.Text == "a" || e.Text == "A") && (e.Modifiers&ui.ModifierControl != 0 || e.Modifiers&ui.ModifierMeta != 0) {
-		if e.Target == homeInputID {
-			a.trans.input.selectAll()
-			return ui.EventResult{Handled: true, Repaint: true}
+	if e.Target == homeInputID && e.Key == ui.KeyEnter && e.Modifiers&(ui.ModifierControl|ui.ModifierMeta) != 0 {
+		if !a.trans.isLoading() {
+			a.startTrans()
 		}
+		return ui.EventResult{Handled: true, Repaint: true}
 	}
-	return ui.EventResult{}
+	if result := a.trans.input.handleShortcut(e); result.Handled {
+		return result
+	}
+	return a.trans.result.handleShortcut(e)
 }
 
 // paintHome 绘制完整模式窗口。

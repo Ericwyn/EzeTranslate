@@ -41,6 +41,10 @@ type ezeApp struct {
 	// switching 为 true 时窗口关闭不退出应用（用于完整<->迷你切换）
 	switching bool
 
+	// 启动参数对应的动作在首个窗口创建后执行；划词文本需在开窗抢焦点前捕获。
+	startupSelection string
+	startupOCR       bool
+
 	// pendingShow 是后台线程（IPC/OCR）请求窗口线程执行的动作队列，
 	// 通过 Invalidate 唤醒、在对应窗口的 OnWake 里取出执行。
 	pendMu   sync.Mutex
@@ -113,10 +117,15 @@ func StartApp(xclip bool, ocrFlag bool) {
 		return
 	}
 
-	// 作为主进程：监听 IPC，异步补发启动参数，然后开窗口进入事件循环。
+	// 作为主进程：先读取划词，避免首个窗口获得焦点后 PRIMARY selection 丢失。
+	startupSelection := ""
+	if xclip {
+		startupSelection = strutils.FormatInputBoxText(trans.GetSelection())
+	}
+
+	// 主进程不通过 IPC 给自己补发启动参数；开窗后直接执行缓存的启动动作。
 	startUnixSocketServer()
-	go sendSocketMessage(xclip, ocrFlag, true)
-	openNewApp()
+	openNewApp(startupSelection, ocrFlag && !xclip)
 }
 
 func sendSocketMessage(xclip bool, ocrFlag bool, sleep bool) {
@@ -134,20 +143,53 @@ func sendSocketMessage(xclip bool, ocrFlag bool, sleep bool) {
 }
 
 // openNewApp 启动 Viva 应用并打开首个窗口（完整 / 迷你）。
-func openNewApp() {
-	eze = &ezeApp{trans: newTransState()}
+func openNewApp(startupSelection string, startupOCR bool) {
+	eze = &ezeApp{
+		trans:            newTransState(),
+		startupSelection: startupSelection,
+		startupOCR:       startupOCR,
+	}
 	appIcon = resource.WindowIcon()
 
 	err := app.RunApplication(func(application *app.Application) error {
 		eze.application = application
 
 		if viper.GetBool(conf.ConfigKeyMiniMode) {
-			return eze.openMiniWindow()
+			if err := eze.openMiniWindow(); err != nil {
+				return err
+			}
+		} else if err := eze.openHomeWindow(); err != nil {
+			return err
 		}
-		return eze.openHomeWindow()
+		eze.runStartupAction()
+		return nil
 	})
 	if err != nil {
 		log.E("Viva 应用运行失败: ", err)
+	}
+}
+
+func (a *ezeApp) runStartupAction() {
+	if a.startupSelection != "" {
+		selection := a.startupSelection
+		a.startupSelection = ""
+		if a.homeWin != nil && !a.homeWin.Closed() {
+			a.postHome(func() {
+				a.trans.selectNow = selection
+				a.trans.input.SetText(selection)
+				a.startTransFormattedText(selection)
+			})
+		} else {
+			a.postMini(func() {
+				a.trans.selectNow = selection
+				a.startTransFormattedText(selection)
+			})
+		}
+		return
+	}
+	if a.startupOCR {
+		a.startupOCR = false
+		go a.runOcr(false)
 	}
 }
 
@@ -168,6 +210,7 @@ func (a *ezeApp) postMini(fn func()) {
 
 // drainHome / drainMini 在窗口线程的 OnWake 里调用，执行投递来的动作。
 func (a *ezeApp) drainHome() {
+	a.trans.applyResult()
 	a.pendMu.Lock()
 	fns := a.homeWake
 	a.homeWake = nil
@@ -178,6 +221,7 @@ func (a *ezeApp) drainHome() {
 }
 
 func (a *ezeApp) drainMini() {
+	a.trans.applyResult()
 	a.pendMu.Lock()
 	fns := a.miniWake
 	a.miniWake = nil
@@ -193,14 +237,23 @@ func (a *ezeApp) drainMini() {
 // 它可能被按钮点击（窗口线程）或 IPC 回调（后台线程）触发，内部只读写
 // 受保护的 transState，真正的 UI 刷新交给 Invalidate + OnWake。
 func (a *ezeApp) startTrans() {
-	var formatText string
+	var text string
 	if a.homeWin != nil && !a.homeWin.Closed() {
-		formatText = strutils.FormatInputBoxText(a.trans.input.Text())
+		text = a.trans.input.Text()
 	} else {
 		// 迷你模式下没有输入框，直接取划词
-		formatText = strutils.FormatInputBoxText(trans.GetSelection())
+		text = trans.GetSelection()
 	}
+	a.startTransText(text)
+}
 
+// startTransText 使用已捕获的文本翻译。划词/OCR 回调可能已经让窗口取得焦点，
+// 此时不能再从系统选区读取一次，否则会读到空内容或另一段文本。
+func (a *ezeApp) startTransText(text string) {
+	a.startTransFormattedText(strutils.FormatInputBoxText(text))
+}
+
+func (a *ezeApp) startTransFormattedText(formatText string) {
 	if strings.Trim(formatText, " ") == "" {
 		a.trans.setNote("请输入需要翻译的内容")
 		a.invalidateActive()
@@ -277,7 +330,11 @@ func startUnixSocketServer() {
 
 // onNewSelection 处理划词翻译：读取划词填入输入框，必要时触发翻译。
 func (a *ezeApp) onNewSelection() {
-	selectText := strutils.FormatInputBoxText(trans.GetSelection())
+	a.onNewSelectionText(trans.GetSelection())
+}
+
+func (a *ezeApp) onNewSelectionText(selectText string) {
+	selectText = strutils.FormatInputBoxText(selectText)
 	log.D("获取的划词: " + selectText)
 	a.trans.selectNow = selectText
 
@@ -297,7 +354,7 @@ func (a *ezeApp) onNewSelection() {
 		return
 	}
 	// 迷你模式：直接翻译划词
-	a.startTrans()
+	a.startTransFormattedText(selectText)
 }
 
 // runOcr 处理 OCR：隐藏窗口 -> 截图识别 -> 恢复窗口 -> 填入输入框（可选翻译）。
@@ -325,16 +382,19 @@ func (a *ezeApp) runOcr(alsoTranslate bool) {
 				a.focusActive()
 				if !success {
 					log.E("ocr 识别失败")
+					a.trans.setNote("OCR 未完成：请检查桌面截图权限、Tesseract 语言包，并查看运行日志")
+					a.invalidateActive()
 					return
 				}
 				ocrRes = strutils.FormatInputBoxText(ocrRes)
+				a.trans.setNote("")
 				log.D("获取的 OCR: " + ocrRes)
 				a.trans.selectNow = ocrRes
 				if a.homeWin != nil && !a.homeWin.Closed() {
 					a.trans.input.SetText(ocrRes)
 				}
 				if alsoTranslate {
-					a.startTrans()
+					a.startTransFormattedText(ocrRes)
 				}
 			})
 		},

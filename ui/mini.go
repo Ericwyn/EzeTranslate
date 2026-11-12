@@ -16,10 +16,8 @@ type miniView struct {
 
 var mini = &miniView{}
 
-// openMiniWindow 打开迷你模式窗口（无输入框，只翻译划词/结果）。
-func (a *ezeApp) openMiniWindow() error {
-	theme := ui.LightTheme()
-
+// miniConfig 与 headless 测试共享迷你模式的事件接线。
+func (a *ezeApp) miniConfig(theme ui.Theme) app.Config {
 	config := app.Config{
 		Tree:        &tree,
 		Title:       "EzeTranslate",
@@ -30,6 +28,9 @@ func (a *ezeApp) openMiniWindow() error {
 		ClearColor:  clearColor(theme),
 		Invalidator: a.trans.miniInv,
 		OnWake:      a.drainMini,
+		OnPointer:   a.trans.result.handlePointer,
+		OnKey:       a.trans.result.handleKey,
+		OnShortcut:  a.trans.result.handleShortcut,
 		OnScroll: func(e ui.ScrollEvent) ui.EventResult {
 			return a.trans.result.handleScroll(e)
 		},
@@ -39,6 +40,12 @@ func (a *ezeApp) openMiniWindow() error {
 		a.paintMini(canvas, size, theme)
 	}
 
+	return config
+}
+
+// openMiniWindow 打开迷你模式窗口（无输入框，只翻译划词/结果）。
+func (a *ezeApp) openMiniWindow() error {
+	config := a.miniConfig(ui.LightTheme())
 	config.OnClosed = func() {
 		if a.switching {
 			a.switching = false
